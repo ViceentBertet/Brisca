@@ -8,6 +8,29 @@ window.onload = () => {
 socket.on("chat", function(msg) {
     addMessage(msg, false);
 });
+socket.on("mensaje", function(msg) {
+    mostrarMensaje(msg);
+});
+socket.on("triunfo", function(triunfo) {
+    let triunfoSrc = crearImagen(triunfo);
+    addTriunfo(triunfo, triunfoSrc);
+});
+socket.on("carta", function(cartas) {
+    cartas.forEach(carta => {
+        let img = document.createElement("img");
+        img.src = crearImagen(carta);
+        img.alt = carta;
+        document.getElementById("cartas").appendChild(img);
+    });
+});
+function crearImagen(cartaString) {
+    return "./img/" + cartaString.replace(" de ", "_") + ".png";
+}
+function pedirCarta() {
+    if (turno) {
+        socket.emit("pedirCarta", nom);
+    }
+}
 function guardarNombre() {
     nom = nombre.value;
     pedirNombre.classList.toggle('ocultar');
@@ -48,4 +71,20 @@ function addMessage(message, eresTu) {
     div.appendChild(comment);
     document.getElementById("chat").appendChild(div);
     chat.scrollTo(0, chat.scrollHeight);
+}
+function mostrarMensaje(msg) {
+    let div = document.createElement("div");
+    div.classList.add("centrar");
+    div.classList.add("contenedor");
+
+    div.innerText = msg;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+}
+function addTriunfo(nomCarta, carta) {
+    let newTriunfo = document.createElement("img");
+    newTriunfo.src = carta;
+    newTriunfo.alt = nomCarta;
+
+    triunfo.appendChild(newTriunfo);
 }

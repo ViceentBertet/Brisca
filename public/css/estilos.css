@@ -4,7 +4,10 @@ body {
     background-color: #222;
     font-family: 'Verdana';
     color: whitesmoke;
+    div {
+        border-radius: 20px;
 
+    }
 }
 .username {
     font-size:10px;
@@ -16,22 +19,20 @@ body {
 
 }
 .contenedor {
-    margin:200px auto;
     width: 300px;
     padding: 20px;
     background-color: #333;
-    border-radius: 20px;
 }
 #cont-chat {
+    height: 300px;
+    position: absolute;
+    bottom: 1%;
+    right: 1%;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 #pedirNombre {
-    position:absolute;
-    margin: 100px auto;
-    left: 0;
-    right: 0;
     z-index: 100;
     text-align: center;
     h2 {
@@ -96,7 +97,6 @@ button {
 .deEl {
     background-color: #222;
 }
-
 #protector {
     background-color:black;
     width:100%;
@@ -109,4 +109,44 @@ button {
 }
 .ocultar {
     display: none;
+}
+.centrar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -51%);
+}
+#cont_cartas {
+    height: 300px;
+    width:490px;
+    position: absolute;
+    bottom: 1%;
+    left: 1%;
+    text-align: center;
+}
+#cartas {
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 10px;
+    img {
+        width: 150px;
+        transition: all .5s;
+    }
+    img:hover {
+        cursor: pointer;
+        transition: all .5s;
+        filter: drop-shadow(0 0 5px white);
+    }
+}
+#cont_triunfo {
+    position: absolute;
+    top: 1%;
+    right: 1%;
+    text-align: center;
+    img {
+        width: 150px;
+    }
+    div {margin: auto;}
 }
