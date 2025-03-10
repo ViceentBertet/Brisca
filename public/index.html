@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="css/estilos.css">
+    <script src="js/cliente.js"></script>
+</head>
+<body>
+    <div id="pedirNombre" class="contenedor">
+        <h2>Introduce tu nombre:</h2>
+        <input type="text" name="nombre" id="nombre" placeholder="Escribelo aquí...">
+        <button id="enviarNombre" >Aceptar</button>
+    </div>
+    <div id="protector"></div>
+    <div id="cont-chat" class="contenedor">
+        <div id="chat"></div>
+        <div id="controles">
+            <input id="msg" type="text" placeholder="Escribe un mensaje...">
+            <button id="boton">Enviar</button>
+        </div>
+    </div>
+</body>
+</html>
