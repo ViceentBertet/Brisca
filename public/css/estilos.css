@@ -4,10 +4,7 @@ body {
     background-color: #222;
     font-family: 'Verdana';
     color: whitesmoke;
-    div {
-        border-radius: 20px;
-
-    }
+    overflow: hidden; /* Oculta el scroll en toda la página */
 }
 .username {
     font-size:10px;
@@ -22,16 +19,9 @@ body {
     width: 300px;
     padding: 20px;
     background-color: #333;
+    border-radius: 20px;
 }
-#cont-chat {
-    height: 300px;
-    position: absolute;
-    bottom: 1%;
-    right: 1%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+
 #pedirNombre {
     z-index: 100;
     text-align: center;
@@ -116,14 +106,7 @@ button {
     left: 50%;
     transform: translate(-50%, -51%);
 }
-#cont_cartas {
-    height: 300px;
-    width:490px;
-    position: absolute;
-    bottom: 1%;
-    left: 1%;
-    text-align: center;
-}
+
 #cartas {
     display: flex;
     justify-content: center;
@@ -131,7 +114,8 @@ button {
     flex-wrap: wrap;
     gap: 10px;
     img {
-        width: 150px;
+        max-width: 150px;
+        width: 30%;
         transition: all .5s;
     }
     img:hover {
@@ -140,13 +124,39 @@ button {
         filter: drop-shadow(0 0 5px white);
     }
 }
+#arriba {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    gap:10px;
+    height: calc(50dvh - 20px);
+    width: 100%;
+}
+#abajo {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    gap:10px;
+    height: calc(50dvh - 20px);
+    width: 100%;
+}
 #cont_triunfo {
-    position: absolute;
-    top: 1%;
-    right: 1%;
     text-align: center;
     img {
-        width: 150px;
+        max-width: 150px;
+        margin: auto;
     }
-    div {margin: auto;}
+}
+#cont_cartas {
+    height: 300px;
+    max-width:490px;
+    width: 50%;
+    text-align: center;
+}
+#cont_chat {
+    margin-left: auto;
+    margin-right: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }

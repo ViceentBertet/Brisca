@@ -16,13 +16,32 @@ socket.on("triunfo", function(triunfo) {
     addTriunfo(triunfo, triunfoSrc);
 });
 socket.on("carta", function(cartas) {
-    cartas.forEach(carta => {
-        let img = document.createElement("img");
-        img.src = crearImagen(carta);
-        img.alt = carta;
-        document.getElementById("cartas").appendChild(img);
-    });
+    if (cont_cartas.classList.contains("ocultar") && cont_triunfo.classList.contains("ocultar")) {
+        cont_triunfo.classList.remove("ocultar");
+        cont_cartas.classList.remove("ocultar");
+    }
+    if (Array.isArray(cartas)) {
+        cartas.forEach(carta => {
+            crearCarta(carta);
+        });
+    } else {
+        crearCarta(cartas);
+    }
 });
+function crearCarta(cartaString) {
+    let img = document.createElement("img");
+    img.src = crearImagen(cartaString);
+    img.alt = cartaString;
+    img.addEventListener("click", jugarCarta);
+    cartas.appendChild(img);
+}
+function jugarCarta(e) {
+    if (turno) {
+        let carta = e.target.alt;
+        socket.emit("jugarCarta", carta);
+        e.target.remove();
+    }
+}
 function crearImagen(cartaString) {
     return "./img/" + cartaString.replace(" de ", "_") + ".png";
 }
@@ -35,14 +54,12 @@ function guardarNombre() {
     nom = nombre.value;
     pedirNombre.classList.toggle('ocultar');
     protector.classList.toggle('ocultar');
-
+    socket.emit("nuevoUsuario", nom);
 }
 function sendMessage() {
     if (!msg.value) return false;
     const message = [msg.value, nom];
-    
     socket.emit("chat", message);
-
     addMessage(message, true);
     msg.value = "";
 }

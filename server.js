@@ -9,6 +9,7 @@ const io = socketIo(server);
 
 // variables para el juego
 let jugadores = [];
+let jugadoresNombre = [];
 const cartas = [
     "uno de oros", "dos de oros", "tres de oros", "cuatro de oros",
     "cinco de oros", "seis de oros", "siete de oros", "diez de oros",
@@ -31,20 +32,23 @@ app.use(express.static('public'));
 
 io.on("connection", (socket) => {
     console.log("Nuevo usuario conectado " + socket.id);
-    if (jugadores.length < 2) {
-        jugadores[jugadores.length] = socket.id;
-        socket.emit("mensaje", "Bienvenido a la mesa");
-        if (jugadores.length == 2) {
-            triunfo();
-            repartirCartas();
-            socket.broadcast.emit("mensaje", "La partida comienza");
-            let nuevoTurno = jugadores[Math.floor(Math.random() * jugadores.length)];
-            console.log("Turno de " + nuevoTurno);
-            io.to(nuevoTurno).emit("mensaje", "Es tu turno");
+    socket.on("nuevoUsuario", (nom) => {
+        if (jugadores.length < 2) {
+            jugadores[jugadores.length] = socket.id;
+            jugadoresNombre[jugadoresNombre.length] = nom;
+            setTimeout(() => socket.emit("mensaje", "Bienvenido a la mesa " + nom),500);
+            if (jugadores.length == 2) {
+                triunfo();
+                repartirCartas();
+                socket.broadcast.emit("mensaje", "La partida comienza");
+                let nuevoTurno = jugadores[Math.floor(Math.random() * jugadores.length)];
+                console.log("Turno de " + nuevoTurno);
+                setTimeout(() =>  io.to(nuevoTurno).emit("mensaje", "Es tu turno"), 4000);
+            }
+        } else {
+            socket.emit("mensaje", "Lo siento, ya hay dos jugadores en la mesa. Visualiza la partida como espectador");
         }
-    } else {
-        socket.emit("mensaje", "Lo siento, ya hay dos jugadores en la mesa. Visualiza la partida como espectador");
-    }
+    })
     socket.on("pedirCarta", (nom) => {
         let carta = cartas[Math.floor(Math.random() * cartas.length)];
         socket.emit("carta", carta);
@@ -54,6 +58,18 @@ io.on("connection", (socket) => {
     })
     socket.on("disconnect", () => {
         console.log("Usuario desconectado");
+        if (jugadores.indexOf(socket.id) != -1) {
+            let indice = jugadores.indexOf(socket.id);
+            let nomPerdedor = jugadoresNombre[indice];
+            jugadores.splice(indice, 1);
+            jugadoresNombre.splice(indice, 1);
+            let nomGanador = jugadoresNombre[0];
+
+            io.emit("mensaje", `${nomPerdedor} ha abandonado la partida`);
+            io.emit("mensaje", `${nomGanador} ha abandonado la partida`);
+            jugadores = [];
+            jugadoresNombre = [];
+        }
     })
 })
 function repartirCartas() {
