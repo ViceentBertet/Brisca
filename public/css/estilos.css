@@ -4,7 +4,7 @@ body {
     background-color: #222;
     font-family: 'Verdana';
     color: whitesmoke;
-    overflow: hidden; /* Oculta el scroll en toda la página */
+    overflow: hidden; 
 }
 .username {
     font-size:10px;
@@ -13,15 +13,12 @@ body {
 }
 .der {
     text-align: right;
-
 }
 .contenedor {
-    width: 300px;
     padding: 20px;
     background-color: #333;
     border-radius: 20px;
 }
-
 #pedirNombre {
     z-index: 100;
     text-align: center;
@@ -42,8 +39,9 @@ body {
     flex-direction: column;
     padding: 10px;
     width: 90%;
-    height: 200px;
+    height: 20vh;
     border: 1px solid whitesmoke;
+    border-right: #333;
     border-radius: 20px;
     margin-bottom: 10px;
     overflow-y: scroll;
@@ -124,38 +122,55 @@ button {
         filter: drop-shadow(0 0 5px white);
     }
 }
-#arriba {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    gap:10px;
-    height: calc(50dvh - 20px);
+main {
     width: 100%;
+    height: 100vh;
+    display: grid;
+}
+section {
+    display: grid;
+    grid-template-columns: 1.75fr 1.25fr;
+    grid-template-areas: "izq der";
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+    gap:10px;
+    height: calc(50vh - 50px);
+    width: 100%;
+    & > div {
+        width: 80%;
+    }
+}
+#arriba {
+    align-self: flex-start;
 }
 #abajo {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    gap:10px;
-    height: calc(50dvh - 20px);
-    width: 100%;
+    align-self: flex-end;
+}
+#cont_mesa {
+    grid-area:izq;
 }
 #cont_triunfo {
     text-align: center;
+    grid-area:der;
+
     img {
         max-width: 150px;
         margin: auto;
     }
 }
 #cont_cartas {
-    height: 300px;
+    grid-area:izq;
     max-width:490px;
     width: 50%;
     text-align: center;
 }
 #cont_chat {
-    margin-left: auto;
-    margin-right: 100px;
+    grid-area:der;
+    justify-self: right;
+    align-self:  flex-end;
+    margin-right: 10px;
+    max-width: 350px;
     display: flex;
     flex-direction: column;
     justify-content: center;

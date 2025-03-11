@@ -3,8 +3,11 @@ let nom;
 let turno = false;
 window.onload = () => {
     boton.addEventListener("click", sendMessage);
+    msg.addEventListener("keydown", function(event) {if (event.key === "Enter") sendMessage();});
     enviarNombre.addEventListener("click", guardarNombre);
 };
+
+/*          SOCKETS         */
 socket.on("chat", function(msg) {
     addMessage(msg, false);
 });
@@ -28,28 +31,8 @@ socket.on("carta", function(cartas) {
         crearCarta(cartas);
     }
 });
-function crearCarta(cartaString) {
-    let img = document.createElement("img");
-    img.src = crearImagen(cartaString);
-    img.alt = cartaString;
-    img.addEventListener("click", jugarCarta);
-    cartas.appendChild(img);
-}
-function jugarCarta(e) {
-    if (turno) {
-        let carta = e.target.alt;
-        socket.emit("jugarCarta", carta);
-        e.target.remove();
-    }
-}
-function crearImagen(cartaString) {
-    return "./img/" + cartaString.replace(" de ", "_") + ".png";
-}
-function pedirCarta() {
-    if (turno) {
-        socket.emit("pedirCarta", nom);
-    }
-}
+
+/*          CHAT             */
 function guardarNombre() {
     nom = nombre.value;
     pedirNombre.classList.toggle('ocultar');
@@ -97,6 +80,30 @@ function mostrarMensaje(msg) {
     div.innerText = msg;
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 3000);
+}
+
+/*          CARTAS         */
+function crearCarta(cartaString) {
+    let img = document.createElement("img");
+    img.src = crearImagen(cartaString);
+    img.alt = cartaString;
+    img.addEventListener("click", jugarCarta);
+    cartas.appendChild(img);
+}
+function jugarCarta(e) {
+    if (turno) {
+        let carta = e.target.alt;
+        socket.emit("jugarCarta", carta);
+        e.target.remove();
+    }
+}
+function crearImagen(cartaString) {
+    return "./img/" + cartaString.replace(" de ", "_") + ".png";
+}
+function pedirCarta() {
+    if (turno) {
+        socket.emit("pedirCarta", nom);
+    }
 }
 function addTriunfo(nomCarta, carta) {
     let newTriunfo = document.createElement("img");
