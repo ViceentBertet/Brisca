@@ -31,7 +31,6 @@ const cartas = [
 app.use(express.static('public'));
 
 io.on("connection", (socket) => {
-    console.log("Nuevo usuario conectado " + socket.id);
     socket.on("nuevoUsuario", (nom) => {
         if (jugadores.length < 2) {
             jugadores[jugadores.length] = socket.id;
@@ -43,7 +42,7 @@ io.on("connection", (socket) => {
                 socket.broadcast.emit("mensaje", "La partida comienza");
                 let nuevoTurno = jugadores[Math.floor(Math.random() * jugadores.length)];
                 console.log("Turno de " + nuevoTurno);
-                setTimeout(() =>  io.to(nuevoTurno).emit("mensaje", "Es tu turno"), 4000);
+                setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 4000);
             }
         } else {
             socket.emit("mensaje", "Lo siento, ya hay dos jugadores en la mesa. Visualiza la partida como espectador");
@@ -57,7 +56,6 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("chat", msg);
     })
     socket.on("disconnect", () => {
-        console.log("Usuario desconectado");
         if (jugadores.indexOf(socket.id) != -1) {
             let indice = jugadores.indexOf(socket.id);
             let nomPerdedor = jugadoresNombre[indice];
@@ -79,10 +77,12 @@ function repartirCartas() {
             let carta = nuevaCarta();
             cartas[i] =  carta;
         }
+        console.log(cartas);
         io.to(jugador).emit("carta", cartas);
     })
 }
 function nuevaCarta() {
+    console.log(cartas.length);
     let carta = cartas[Math.floor(Math.random() * cartas.length)];
     cartas.splice(cartas.indexOf(carta), 1);
     return carta;

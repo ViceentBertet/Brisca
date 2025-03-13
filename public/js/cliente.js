@@ -31,6 +31,7 @@ socket.on("carta", function(cartas) {
         crearCarta(cartas);
     }
 });
+socket.on("turno", cambiarTurno());
 
 /*          CHAT             */
 function guardarNombre() {
@@ -83,6 +84,14 @@ function mostrarMensaje(msg) {
 }
 
 /*          CARTAS         */
+function cambiarTurno() {
+    turno = !turno;
+    if (turno) {
+        mostrarMensaje("Es tu turno");
+    } else {
+        mostrarMensaje("Es el turno de tu oponente");
+    }
+}
 function crearCarta(cartaString) {
     let img = document.createElement("img");
     img.src = crearImagen(cartaString);
@@ -90,14 +99,18 @@ function crearCarta(cartaString) {
     img.addEventListener("click", jugarCarta);
     cartas.appendChild(img);
 }
-function jugarCarta(e) {
+function jugarCarta() {
     if (turno) {
-        let carta = e.target.alt;
+        let carta = this.alt;
         socket.emit("jugarCarta", carta);
-        e.target.remove();
+        let juegaCarta = document.createElement("img");
+        juegaCarta.src = crearImagen(carta);
+        jugador.appendChild(juegaCarta);
+        this.remove();
     }
 }
 function crearImagen(cartaString) {
+    console.log(cartaString);
     return "./img/" + cartaString.replace(" de ", "_") + ".png";
 }
 function pedirCarta() {
@@ -109,6 +122,5 @@ function addTriunfo(nomCarta, carta) {
     let newTriunfo = document.createElement("img");
     newTriunfo.src = carta;
     newTriunfo.alt = nomCarta;
-
     triunfo.appendChild(newTriunfo);
 }
