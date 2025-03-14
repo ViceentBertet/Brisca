@@ -19,8 +19,9 @@ socket.on("triunfo", function(triunfo) {
     addTriunfo(triunfo, triunfoSrc);
 });
 socket.on("carta", function(cartas) {
-    if (cont_cartas.classList.contains("ocultar") && cont_triunfo.classList.contains("ocultar")) {
+    if (cont_cartas.classList.contains("ocultar") && cont_triunfo.classList.contains("ocultar") && cont_puntos.classList.contains("ocultar")) {
         cont_triunfo.classList.remove("ocultar");
+        cont_puntos.classList.remove("ocultar");
         cont_cartas.classList.remove("ocultar");
     }
     if (Array.isArray(cartas)) {
@@ -66,21 +67,27 @@ function addMessage(message, eresTu) {
         user.innerText = nom.toString().toLowerCase();
         comment.classList.add("deEl")
     };
-    
-    div.classList.add("cont-msj");
     div.appendChild(user);
     div.appendChild(comment);
     document.getElementById("chat").appendChild(div);
     chat.scrollTo(0, chat.scrollHeight);
 }
 function mostrarMensaje(msg) {
-    let div = document.createElement("div");
-    div.classList.add("centrar");
-    div.classList.add("contenedor");
+    let divTodo = document.createElement("div");
 
-    div.innerText = msg;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
+    let nom = document.createElement("div");
+    nom.innerText = "servidor";
+    nom.classList.add("username");
+    nom.classList.add("nom_servidor");
+
+    let msj = document.createElement("div");
+    msj.classList.add("msj");
+    msj.classList.add("msj_servidor");
+    msj.innerText = msg;
+
+    divTodo.appendChild(nom);
+    divTodo.appendChild(msj);
+    chat.appendChild(divTodo);
 }
 
 /*          CARTAS         */

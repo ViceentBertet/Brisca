@@ -86,6 +86,16 @@ button {
 .deEl {
     background-color: #222;
 }
+.nom_servidor {
+    color: #fcf75e;
+    text-align: center;
+}
+.msj_servidor {
+    margin: 0 auto;    
+    margin-bottom:10px;
+    background-color: #fcf75e;
+    color: #333;
+}
 #protector {
     background-color:black;
     width:100%;
@@ -105,7 +115,6 @@ button {
     left: 50%;
     transform: translate(-50%, -51%);
 }
-
 #cartas {
     display: flex;
     justify-content: center;
@@ -134,7 +143,7 @@ section {
     grid-template-areas: "izq der";
     width: 100%;
     gap:10px;
-    height: calc(50vh - 50px);
+    height: 50vh;
     width: 100%;
     & > div {
         margin: 25px;
@@ -156,8 +165,8 @@ section {
     grid-area:izq;
     align-self: flex-start;
     justify-self: center;
-    width: calc(100% - 40px - 50px);
-    height: calc(100% - 40px - 50px);
+    width: calc(100% - 90px);
+    height: calc(100% - 90px);
     #mesa{
         width: 100%;
         height: calc(100% - 60px);
@@ -169,19 +178,42 @@ section {
         }
     }
 }
+#cont_info {
+    width:  calc(100% - 50px);
+    height:  calc(100% - 50px);
+    grid-area: izq;
+    display: grid;
+    grid-template-columns:  1fr 1fr;
+    margin: 25px;
+    gap: 10px;
+}
 #cont_triunfo {
-    text-align: center;
+    height: calc(100% - 90px);
     grid-area: der;
+    text-align: center;
     align-self: flex-start;
     justify-self: right;
-    height: calc(100% - 40px - 50px);
     img {
         height: 200px;
         margin: auto;
     }
 }
+#cont_puntos {
+    width: 350px;
+    height: 200px;
+    align-self: flex-end;
+    justify-self: center;
+    text-align: center;
+    #puntos {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: calc(100% - 70px);
+        color: #fcf75e;
+        font-size: 40px;
+    }
+}
 #cont_cartas {
-    grid-area: izq;
     align-self: flex-end;
     justify-self: center;
     text-align: center;
