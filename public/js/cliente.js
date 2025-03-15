@@ -1,5 +1,6 @@
 const socket = io();
 let nom;
+let paloTriunfo;
 let turno = false;
 window.onload = () => {
     boton.addEventListener("click", sendMessage);
@@ -14,25 +15,6 @@ socket.on("chat", function(msg) {
 socket.on("mensaje", function(msg) {
     mostrarMensaje(msg);
 });
-socket.on("triunfo", function(triunfo) {
-    let triunfoSrc = crearImagen(triunfo);
-    addTriunfo(triunfo, triunfoSrc);
-});
-socket.on("carta", function(cartas) {
-    if (cont_cartas.classList.contains("ocultar") && cont_triunfo.classList.contains("ocultar") && cont_puntos.classList.contains("ocultar")) {
-        cont_triunfo.classList.remove("ocultar");
-        cont_puntos.classList.remove("ocultar");
-        cont_cartas.classList.remove("ocultar");
-    }
-    if (Array.isArray(cartas)) {
-        cartas.forEach(carta => {
-            crearCarta(carta);
-        });
-    } else {
-        crearCarta(cartas);
-    }
-});
-socket.on("turno", cambiarTurno());
 
 /*          CHAT             */
 function guardarNombre() {
@@ -88,15 +70,43 @@ function mostrarMensaje(msg) {
     divTodo.appendChild(nom);
     divTodo.appendChild(msj);
     chat.appendChild(divTodo);
+    chat.scrollTo(0, chat.scrollHeight);
 }
 
 /*          CARTAS         */
+socket.on("triunfo", function(triunfo) {
+    let triunfoSrc = crearImagen(triunfo);
+    addTriunfo(triunfo, triunfoSrc);
+});
+socket.on("carta", function(cartas) {
+    if (cont_cartas.classList.contains("ocultar") && cont_triunfo.classList.contains("ocultar") && cont_puntos.classList.contains("ocultar")) {
+        cont_triunfo.classList.remove("ocultar");
+        cont_puntos.classList.remove("ocultar");
+        cont_cartas.classList.remove("ocultar");
+    }
+    if (Array.isArray(cartas)) {
+        let div = document.getElementById("cartas");
+        cartas.forEach(carta => {
+            let img = crearCarta(carta);
+            div.appendChild(img);
+        });
+    } else {
+        let div = document.getElementById("cartas");
+        let img = crearCarta(cartas);
+        div.appendChild(img);
+    }
+});
+socket.on("turno", cambiarTurno);
+socket.on("juegaCarta", function(carta) {
+    cambiarTurno();
+    let img = crearCarta(carta);
+    contrincante.appendChild(img);
+    setTimeout(deliberando, 1000);
+});
 function cambiarTurno() {
     turno = !turno;
     if (turno) {
-        mostrarMensaje("Es tu turno");
-    } else {
-        mostrarMensaje("Es el turno de tu oponente");
+        mostrarMensaje("¡Corre! Es tu turno");
     }
 }
 function crearCarta(cartaString) {
@@ -104,7 +114,7 @@ function crearCarta(cartaString) {
     img.src = crearImagen(cartaString);
     img.alt = cartaString;
     img.addEventListener("click", jugarCarta);
-    cartas.appendChild(img);
+    return img;
 }
 function jugarCarta() {
     if (turno) {
@@ -122,12 +132,44 @@ function crearImagen(cartaString) {
 }
 function pedirCarta() {
     if (turno) {
-        socket.emit("pedirCarta", nom);
+        socket.emit("pedirCarta");
     }
 }
 function addTriunfo(nomCarta, carta) {
     let newTriunfo = document.createElement("img");
     newTriunfo.src = carta;
     newTriunfo.alt = nomCarta;
+    paloTriunfo = sacarPalo(nomCarta);
     triunfo.appendChild(newTriunfo);
+}
+function deliberando() {
+    let div = document.createElement("div");
+    div.id = "cont_deliberando";
+    div.classList.add("contenedor");
+    let img = document.createElement("img");
+    img.src = "./img/deliberando.gif";
+    div.appendChild(img);
+    setTimeout(deliberado, 2000);
+}
+function deliberado() {
+    cont_deliberando.remove();
+    setTimeout(determinarGanador, 1000);
+}
+function determinarGanador() {
+    let cartaUno = jugador.alt;
+    let cartaDos = contrincante.alt;
+
+    if () {
+
+    } else {
+
+    }
+}
+function sacarNumero(cartaString) {
+    let num = cartaString.split(' de ')[0];
+    return num;
+}
+function sacarPalo(cartaString) {
+    let palo = cartaString.split(' de ')[1];
+    return palo;
 }

@@ -10,22 +10,22 @@ const io = socketIo(server);
 // variables para el juego
 let jugadores = [];
 let jugadoresNombre = [];
-const cartas = [
-    "uno de oros", "dos de oros", "tres de oros", "cuatro de oros",
-    "cinco de oros", "seis de oros", "siete de oros", "diez de oros",
-    "once de oros", "doce de oros",
+let cartas = [
+    "1 de oros", "2 de oros", "3 de oros", "4 de oros",
+    "5 de oros", "6 de oros", "7 de oros", "10 de oros",
+    "11 de oros", "12 de oros",
 
-    "uno de copas", "dos de copas", "tres de copas", "cuatro de copas",
-    "cinco de copas", "seis de copas", "siete de copas", "diez de copas",
-    "once de copas", "doce de copas",
+    "1 de copas", "2 de copas", "3 de copas", "4 de copas",
+    "5 de copas", "6 de copas", "7 de copas", "10 de copas",
+    "11 de copas", "12 de copas",
 
-    "uno de bastos", "dos de bastos", "tres de bastos", "cuatro de bastos",
-    "cinco de bastos", "seis de bastos", "siete de bastos", "diez de bastos",
-    "once de bastos", "doce de bastos",
+    "1 de bastos", "2 de bastos", "3 de bastos", "4 de bastos",
+    "5 de bastos", "6 de bastos", "7 de bastos", "10 de bastos",
+    "11 de bastos", "12 de bastos",
 
-    "uno de espadas", "dos de espadas", "tres de espadas", "cuatro de espadas",
-    "cinco de espadas", "seis de espadas", "siete de espadas", "diez de espadas",
-    "once de espadas", "doce de espadas"
+    "1 de espadas", "2 de espadas", "3 de espadas", "4 de espadas",
+    "5 de espadas", "6 de espadas", "7 de espadas", "10 de espadas",
+    "11 de espadas", "12 de espadas"
 ];
 // Para que al conectarse al puerto 3000  salga nuestro index.html
 app.use(express.static('public'));
@@ -35,11 +35,11 @@ io.on("connection", (socket) => {
         if (jugadores.length < 2) {
             jugadores[jugadores.length] = socket.id;
             jugadoresNombre[jugadoresNombre.length] = nom;
-            setTimeout(() => socket.emit("mensaje", "Bienvenido a la mesa " + nom),500);
+            socket.emit("mensaje", "Bienvenido a la mesa " + nom);
             if (jugadores.length == 2) {
                 triunfo();
                 repartirCartas();
-                socket.broadcast.emit("mensaje", "La partida comienza");
+                io.emit("mensaje", "La partida comienza");
                 let nuevoTurno = jugadores[Math.floor(Math.random() * jugadores.length)];
                 console.log("Turno de " + nuevoTurno);
                 setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 4000);
@@ -48,13 +48,17 @@ io.on("connection", (socket) => {
             socket.emit("mensaje", "Lo siento, ya hay dos jugadores en la mesa. Visualiza la partida como espectador");
         }
     })
-    socket.on("pedirCarta", (nom) => {
+    socket.on("pedirCarta", () => {
         let carta = cartas[Math.floor(Math.random() * cartas.length)];
         socket.emit("carta", carta);
     })
     socket.on("chat", (msg) => {
         socket.broadcast.emit("chat", msg);
-    })
+    });
+    socket.on("jugarCarta", (carta) => {
+        socket.broadcast.emit("juegaCarta", carta);
+        setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 4000);
+    });
     socket.on("disconnect", () => {
         if (jugadores.indexOf(socket.id) != -1) {
             let indice = jugadores.indexOf(socket.id);
@@ -64,7 +68,7 @@ io.on("connection", (socket) => {
             let nomGanador = jugadoresNombre[0];
 
             io.emit("mensaje", `${nomPerdedor} ha abandonado la partida`);
-            io.emit("mensaje", `${nomGanador} ha abandonado la partida`);
+            io.emit("mensaje", `${nomGanador} ha ganado la partida`);
             jugadores = [];
             jugadoresNombre = [];
         }
