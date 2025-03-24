@@ -7,6 +7,11 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log("Servidor corriendo en el puerto " + PORT);
+})
+
 // variables para el juego
 let jugadores = [];
 let jugadoresNombre = [];
@@ -49,7 +54,7 @@ io.on("connection", (socket) => {
         }
     })
     socket.on("pedirCarta", () => {
-        let carta = cartas[Math.floor(Math.random() * cartas.length)];
+        let carta = nuevaCarta();
         socket.emit("carta", carta);
     })
     socket.on("chat", (msg) => {
@@ -57,7 +62,9 @@ io.on("connection", (socket) => {
     });
     socket.on("jugarCarta", (carta) => {
         socket.broadcast.emit("juegaCarta", carta);
-        setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 4000);
+    });
+    socket.on("detGanador", (ganador, puntos) => {
+        socket.broadcast.emit("terminarTurno", ganador, puntos);
     });
     socket.on("disconnect", () => {
         if (jugadores.indexOf(socket.id) != -1) {
@@ -81,21 +88,16 @@ function repartirCartas() {
             let carta = nuevaCarta();
             cartas[i] =  carta;
         }
-        console.log(cartas);
         io.to(jugador).emit("carta", cartas);
     })
 }
 function nuevaCarta() {
-    console.log(cartas.length);
     let carta = cartas[Math.floor(Math.random() * cartas.length)];
     cartas.splice(cartas.indexOf(carta), 1);
+    console.log("Quedan " + cartas.length + " cartas en la baraja");
     return carta;
 }
 function triunfo() {
     let triunfo = nuevaCarta();
     io.emit("triunfo", triunfo);
 }
-const PORT = 3000;
-server.listen(PORT, () => {
-    console.log("Servidor corriendo en el puerto " + PORT);
-})
