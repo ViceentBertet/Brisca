@@ -47,7 +47,7 @@ io.on("connection", (socket) => {
                 io.emit("mensaje", "La partida comienza");
                 let nuevoTurno = jugadores[Math.floor(Math.random() * jugadores.length)];
                 console.log("Turno de " + nuevoTurno);
-                setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 4000);
+                setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 2000);
             }
         } else {
             socket.emit("mensaje", "Lo siento, ya hay dos jugadores en la mesa. Visualiza la partida como espectador");

@@ -4,6 +4,8 @@ let nom;
 let paloTriunfo;
 let turno = false;
 let ganador = false;
+let cartaUnoImg;
+let cartaDosImg;
 window.onload = () => {
     boton.addEventListener("click", sendMessage);
     msg.addEventListener("keydown", function(event) {if (event.key === "Enter") sendMessage();});
@@ -101,6 +103,14 @@ socket.on("juegaCarta", function(carta) {
     cambiarTurno();
     let img = crearCarta(carta);
     contrincante.appendChild(img);
+    cartaUnoImg = jugador.querySelector("img");
+    cartaDosImg = contrincante.querySelector("img");
+
+    if (!cartaUnoImg || !cartaDosImg) {
+        // Si no hay dos cartas, no se puede deliberar
+        return;
+    } 
+
     setTimeout(deliberando, 1000);
 });
 socket.on("terminarTurno", terminarJugada);
@@ -159,19 +169,32 @@ function deliberado() {
     setTimeout(determinarGanador, 1000);
 }
 function determinarGanador() {
-    let cartaUno = jugador.querySelector("img").alt;
-    let cartaDos = contrincante.querySelector("img").alt;
-    if (sacarPalo(cartaUno) == paloTriunfo && sacarPalo(cartaDos) == paloTriunfo) {
-        let indiceUno = NUMEROS_CARTAS.indexOf(sacarNumero(cartaUno));
-        let indiceDos = NUMEROS_CARTAS.indexOf(sacarNumero(cartaDos));
+    let cartaUno = cartaUnoImg.alt;
+    let cartaDos = cartaDosImg.alt;
 
+    let indiceUno = NUMEROS_CARTAS.indexOf(sacarNumero(cartaUno));
+    let indiceDos = NUMEROS_CARTAS.indexOf(sacarNumero(cartaDos));
+    
+    if (sacarPalo(cartaUno) == paloTriunfo && sacarPalo(cartaDos) == paloTriunfo) {
         if (indiceUno > indiceDos) {
             console.log("if 1");
             ganador = true;
         }
+        // Si no, gana el contrincante
     } else if (sacarPalo(cartaUno) == paloTriunfo) {
         ganador = true;
-        console.log("if 2");
+    } else {
+        if (sacarPalo(cartaUno) == sacarPalo(cartaDos)) {
+            if (indiceUno > indiceDos) {
+                ganador = true;
+            }
+            // Si no, gana el contrincante
+        } else if (sacarPalo(cartaDos) == paloTriunfo) {
+            ganador = false;
+            // Si el contrincante tiene triunfo y nosotros no, gana él
+        } else {
+            ganador = true;
+        }
     }
     let puntosTotales = sacarPuntos(cartaUno) + sacarPuntos(cartaDos);
     terminarJugada(ganador, puntosTotales);
@@ -200,7 +223,7 @@ function sacarPuntos(cartaString) {
     return puntos;
 }
 function terminarJugada(ganado, newPuntos) {
-    console.log(turno);
+    turno = false;
     if (ganado) {
         puntos.innerText = parseInt(puntos.innerText) + newPuntos;
         mostrarMensaje("¡Ganaste! Has sumado " + newPuntos + " puntos");
