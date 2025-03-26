@@ -171,39 +171,32 @@ function deliberado() {
 function determinarGanador() {
     let cartaUno = cartaUnoImg.alt;
     let cartaDos = cartaDosImg.alt;
-
-    let indiceUno = NUMEROS_CARTAS.indexOf(sacarNumero(cartaUno));
-    let indiceDos = NUMEROS_CARTAS.indexOf(sacarNumero(cartaDos));
     
-    if (sacarPalo(cartaUno) == paloTriunfo && sacarPalo(cartaDos) == paloTriunfo) {
-        if (indiceUno > indiceDos) {
-            console.log("if 1");
-            ganador = true;
-        }
-        // Si no, gana el contrincante
-    } else if (sacarPalo(cartaUno) == paloTriunfo) {
-        ganador = true;
-    } else {
-        if (sacarPalo(cartaUno) == sacarPalo(cartaDos)) {
-            if (indiceUno > indiceDos) {
-                ganador = true;
-            }
-            // Si no, gana el contrincante
-        } else if (sacarPalo(cartaDos) == paloTriunfo) {
-            ganador = false;
-            // Si el contrincante tiene triunfo y nosotros no, gana él
-        } else {
-            ganador = true;
-        }
-    }
+    ganador = getResultado(cartaUno, cartaDos);
     let puntosTotales = sacarPuntos(cartaUno) + sacarPuntos(cartaDos);
     terminarJugada(ganador, puntosTotales);
     socket.emit("detGanador", !ganador, puntosTotales);
     ganador = false;
 }
+/**
+ * Devuelve true si el jugador ha ganado, false si el contrincante ha ganado
+*/
+function getResultado(cartaUno, cartaDos) {
+    let indiceUno = NUMEROS_CARTAS.indexOf(sacarNumero(cartaUno));
+    let indiceDos = NUMEROS_CARTAS.indexOf(sacarNumero(cartaDos));
+    console.log("cartaUno: " + cartaUno + " cartaDos: " + cartaDos);
+    console.log("indiceUno: " + indiceUno + " indiceDos: " + indiceDos);
+    if (sacarPalo(cartaUno) == sacarPalo(cartaDos) && indiceUno > indiceDos) {
+        return true;
+    } 
+    if (sacarPalo(cartaUno) != sacarPalo(cartaDos) && sacarPalo(cartaDos) != paloTriunfo) {
+        return true
+    }
+    return false;
+}
 function sacarNumero(cartaString) {
     let num = cartaString.split(' de ')[0];
-    return num;
+    return parseInt(num);
 }
 function sacarPalo(cartaString) {
     let palo = cartaString.split(' de ')[1];
@@ -211,13 +204,13 @@ function sacarPalo(cartaString) {
 }
 function sacarPuntos(cartaString) {
     let num = sacarNumero(cartaString);
-    let puntos = 0;
+    let puntos;
     switch (num) {
-        case '10': puntos += 2; break;
-        case '11': puntos += 3; break;
-        case '12': puntos += 4; break;
-        case '3': puntos += 10; break;
-        case '1': puntos += 11; break;
+        case 10: puntos = 2; break;
+        case 11: puntos = 3; break;
+        case 12: puntos = 4; break;
+        case 3: puntos = 10; break;
+        case 1: puntos = 11; break;
         default: puntos = 0;
     }
     return puntos;
