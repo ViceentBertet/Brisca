@@ -113,6 +113,8 @@ socket.on("juegaCarta", function(carta) {
 
     setTimeout(deliberando, 1000);
 });
+socket.on("deliberando", mostrarDeliberando);
+socket.on("deliberado", borrarDeliberando);
 socket.on("terminarTurno", terminarJugada);
 function cambiarTurno() {
     turno = !turno;
@@ -154,18 +156,28 @@ function addTriunfo(nomCarta, carta) {
     paloTriunfo = sacarPalo(nomCarta);
     triunfo.appendChild(newTriunfo);
 }
-function deliberando() {
+function mostrarDeliberando() {
     let div = document.createElement("div");
     div.id = "cont_deliberando";
     div.classList.add("contenedor");
     let img = document.createElement("img");
     img.src = "./img/deliberando.gif";
     div.appendChild(img);
-    document.body.appendChild(div);
-    setTimeout(deliberado, 2000);
+    document.querySelector('main').appendChild(div);
+    protector.classList.remove('ocultar');
+}
+function borrarDeliberando() {
+    cont_deliberando.remove();
+    protector.classList.add('ocultar');
+}
+function deliberando() {
+    socket.emit("mostrarDeliberando");
+    mostrarDeliberando();
+    setTimeout(deliberado, 1000);
 }
 function deliberado() {
-    cont_deliberando.remove();
+    socket.emit("borrarDeliberando");
+    borrarDeliberando();
     setTimeout(determinarGanador, 1000);
 }
 function determinarGanador() {

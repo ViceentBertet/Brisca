@@ -63,6 +63,12 @@ io.on("connection", (socket) => {
     socket.on("jugarCarta", (carta) => {
         socket.broadcast.emit("juegaCarta", carta);
     });
+    socket.on("mostrarDeliberando",() => {
+        socket.broadcast.emit("deliberando");
+    });
+    socket.on("borrarDeliberando",() => {
+        socket.broadcast.emit("deliberado");
+    });
     socket.on("detGanador", (ganador, puntos) => {
         socket.broadcast.emit("terminarTurno", ganador, puntos);
     });

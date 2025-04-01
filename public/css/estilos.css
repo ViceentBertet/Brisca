@@ -230,3 +230,29 @@ section {
     flex-direction: column;
     justify-content: center;
 }
+#cont_deliberando {
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    img {
+        filter: invert(1);
+        mix-blend-mode: screen;
+        width: 200px;
+    }
+}
+.botonesCartas {
+    position:relative;
+    top:-205px;   
+    border-radius: 50%;
+    img {
+        width: 25px;
+    }
+}
+#cantarBrisca {
+    left: -50px;
+}
+#cambiarTriunfo {
+    right: -50px;
+}
