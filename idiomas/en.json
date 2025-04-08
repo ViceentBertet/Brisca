@@ -1,0 +1,25 @@
+{
+    "welcome": "Welcome to Brisca",
+    "whatIs": "What is Brisca?",
+    "description": "Brisca is a traditional card game very popular in Spain and Italy. It is played with a Spanish deck and is ideal for 2 to 4 players.",
+    "basicRules": "Basic Rules",
+    "rules": [
+        "A Spanish deck of 40 cards is used (without eights or nines).",
+        "The goal is to score the highest number of points with the cards won.",
+        "The value of the cards is as follows:",
+        "A hand of 3 cards is dealt to each player, and one card is placed face up on the table to define the trump suit.",
+        "Players play one card per turn, following the suit or using the trump suit if they don't have cards of the initial suit.",
+        "The winner of the trick collects the cards and starts the next one."
+    ],
+    "cardValues": [
+        "Ace: 11 points",
+        "Three: 10 points",
+        "King: 4 points",
+        "Knight: 3 points",
+        "Jack: 2 points",
+        "The rest of the cards have no value."
+    ],
+    "howToWin": "How to Win?",
+    "winDescription": "The player or team with the most points at the end of the game is the winner.",
+    "footer": "© 2023 Brisca Rules"
+}

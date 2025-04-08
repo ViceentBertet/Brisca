@@ -1,0 +1,25 @@
+{
+    "welcome": "Bienvenido a la Brisca",
+    "whatIs": "¿Qué es la Brisca?",
+    "description": "La Brisca es un juego de cartas tradicional muy popular en España e Italia. Se juega con una baraja española y es ideal para 2 a 4 jugadores.",
+    "basicRules": "Reglas Básicas",
+    "rules": [
+        "Se utiliza una baraja española de 40 cartas (sin ochos ni nueves).",
+        "El objetivo es sumar la mayor cantidad de puntos posibles con las cartas ganadas.",
+        "El valor de las cartas es el siguiente:",
+        "Se reparte una mano de 3 cartas a cada jugador y se coloca una carta descubierta en la mesa que define el palo de triunfo.",
+        "Los jugadores juegan una carta por turno, siguiendo el palo o usando el triunfo si no tienen cartas del palo inicial.",
+        "El ganador de la baza recoge las cartas y comienza la siguiente."
+    ],
+    "cardValues": [
+        "As: 11 puntos",
+        "Tres: 10 puntos",
+        "Rey: 4 puntos",
+        "Caballo: 3 puntos",
+        "Sota: 2 puntos",
+        "El resto de cartas no tienen valor."
+    ],
+    "howToWin": "¿Cómo se gana?",
+    "winDescription": "El jugador o equipo con más puntos al final de la partida es el ganador.",
+    "footer": "© 2023 Reglas de la Brisca"
+}

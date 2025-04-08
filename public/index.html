@@ -1,58 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Brisca Española</title>
-    <script src="/socket.io/socket.io.js"></script>
+    <title>Reglas de la Brisca</title>
     <link rel="icon" type="image/png" href="img/icono.png">
-    <link rel="stylesheet" href="css/estilos.css">
-    <script src="js/cliente.js"></script>
+    <script src="js/cambiarIdioma.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            align-items: center;
+            justify-items: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #fff;
+        }
+        h2 {
+            color: #444;
+        }
+        ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem 0;
+            background: #333;
+            color: #fff;
+        }
+
+        .language-switch {
+            margin: 1rem;
+            text-align: center;
+        }
+        .language-switch button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .language-switch {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        .toggle {
+            width: 50px;
+            height: 25px;
+            background-color: #ccc;
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .toggle.active {
+            background-color: #4caf50;
+        }
+        .circle {
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+            transition: left 0.3s ease;
+        }
+        .toggle.active .circle {
+            left: 55%;
+        }
+    </style>
 </head>
 <body>
-    <div id="pedirNombre" class="contenedor centrar">
-        <h2>Introduce tu nombre:</h2>
-        <input type="text" name="nombre" id="nombre" placeholder="Escribelo aquí...">
-        <button id="enviarNombre" >Aceptar</button>
+    <header>
+        <div class="language-switch">
+            <div id="language-toggle" class="toggle">
+                <img src="img/espana.png" alt="Español" class="flag" style="width: 20px; height: 20px; position: absolute; top: 50%; left: -45%; transform: translateY(-50%);">
+                <div class="circle"></div>
+                <img src="img/reino-unido.png" alt="Inglés" class="flag" style="width: 20px; height: 20px; position: absolute; top: 50%; left: 110%; transform: translateY(-50%);">
+            </div>
+        </div>
+        <h1>Bienvenido a la Brisca</h1>
+    </header>
+    <div class="container" id="content">
+        <h2>¿Qué es la Brisca?</h2>
+        <p>La Brisca es un juego de cartas tradicional muy popular en España e Italia. Se juega con una baraja española y es ideal para 2 a 4 jugadores.</p>
+        
+        <h2>Reglas Básicas</h2>
+        <ul>
+            <li>Se utiliza una baraja española de 40 cartas (sin ochos ni nueves).</li>
+            <li>El objetivo es sumar la mayor cantidad de puntos posibles con las cartas ganadas.</li>
+            <li>El valor de las cartas es el siguiente:
+                <ul>
+                    <li>As: 11 puntos</li>
+                    <li>Tres: 10 puntos</li>
+                    <li>Rey: 4 puntos</li>
+                    <li>Caballo: 3 puntos</li>
+                    <li>Sota: 2 puntos</li>
+                    <li>El resto de cartas no tienen valor.</li>
+                </ul>
+            </li>
+            <li>Se reparte una mano de 3 cartas a cada jugador y se coloca una carta descubierta en la mesa que define el palo de triunfo.</li>
+            <li>Los jugadores juegan una carta por turno, siguiendo el palo o usando el triunfo si no tienen cartas del palo inicial.</li>
+            <li>El ganador de la baza recoge las cartas y comienza la siguiente.</li>
+        </ul>
+
+        <h2>¿Cómo se gana?</h2>
+        <p>El jugador o equipo con más puntos al final de la partida es el ganador.</p>
     </div>
-    <div id="protector"></div>
-    <main>
-        <section id="arriba">
-            <div id="cont_mesa" class="contenedor">
-                <h2>Mesa</h2>
-                <div id="mesa">
-                    <div id="contrincante"></div>
-                    <div id="jugador"></div>
-                </div>
-            </div>
-            <div id="cont_triunfo" class="contenedor ocultar">
-                <h2>Triunfo</h2>
-                <div id="triunfo"></div>
-            </div>            
-        </section>
-        <section id="abajo">
-            <div id="cont_info">
-                <div id="cont_puntos" class="contenedor ocultar">
-                    <h2>Tus puntos:</h2>
-                    <div id="puntos">0</div>
-                </div>
-                <div id="cont_cartas" class="contenedor ocultar">
-                    <h2>Cartas</h2>
-                    <div id="cartas"></div>
-                    <div id="acciones">
-                        <button id="cantarBrisca" class="botonesCartas" title="Cantar brisca" disabled><img src="img/brisca.png"></button>
-                        <button id="cambiarTriunfo" class="botonesCartas" title="Cambiar Triunfo" disabled><img src="img/trofeo.png"></button>
-                    </div>
-                </div>
-            </div>
-            <div id="cont_chat" class="contenedor">
-                <div id="chat"></div>
-                <div id="controles">
-                    <input id="msg" type="text" placeholder="Escribe un mensaje...">
-                    <button id="boton">Enviar</button>
-                </div>
-            </div>
-        </section>
-    </main>
+    <footer>
+        <p>© 2023 Reglas de la Brisca</p>
+    </footer>
 </body>
 </html>

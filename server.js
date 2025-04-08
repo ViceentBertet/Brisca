@@ -1,4 +1,5 @@
 // constantes del servidor
+const e = require("express");
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -11,6 +12,15 @@ const PORT = 3000;
 server.listen(PORT, () => {
     console.log("Servidor corriendo en el puerto " + PORT);
 })
+
+// Enviar los archivos de idioma al cliente
+app.get("/lang-es", (req, res) => {
+    res.sendFile(__dirname + "/idiomas/es.json");
+});
+app.get("/lang-en", (req, res) => {
+    res.sendFile(__dirname + "/idiomas/en.json");
+});
+
 
 // variables para el juego
 let jugadores = [];

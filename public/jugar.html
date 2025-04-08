@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Brisca Española</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="icon" type="image/png" href="img/icono.png">
+    <link rel="stylesheet" href="css/estilos.css">
+    <script src="js/juego.js"></script>
+</head>
+<body>
+    <div id="pedirNombre" class="contenedor centrar">
+        <h2>Introduce tu nombre:</h2>
+        <input type="text" name="nombre" id="nombre" placeholder="Escribelo aquí...">
+        <button id="enviarNombre" >Aceptar</button>
+    </div>
+    <div id="protector"></div>
+    <main>
+        <section id="arriba">
+            <div id="cont_mesa" class="contenedor">
+                <h2>Mesa</h2>
+                <div id="mesa">
+                    <div id="contrincante"></div>
+                    <div id="jugador"></div>
+                </div>
+            </div>
+            <div id="cont_triunfo" class="contenedor ocultar">
+                <h2>Triunfo</h2>
+                <div id="triunfo"></div>
+            </div>            
+        </section>
+        <section id="abajo">
+            <div id="cont_info">
+                <div id="cont_puntos" class="contenedor ocultar">
+                    <h2>Tus puntos:</h2>
+                    <div id="puntos">0</div>
+                </div>
+                <div id="cont_cartas" class="contenedor ocultar">
+                    <h2>Cartas</h2>
+                    <div id="cartas"></div>
+                    <div id="acciones">
+                        <button id="cantarBrisca" class="botonesCartas" title="Cantar brisca" disabled><img src="img/brisca.png"></button>
+                        <button id="cambiarTriunfo" class="botonesCartas" title="Cambiar Triunfo" disabled><img src="img/trofeo.png"></button>
+                    </div>
+                </div>
+            </div>
+            <div id="cont_chat" class="contenedor">
+                <div id="chat"></div>
+                <div id="controles">
+                    <input id="msg" type="text" placeholder="Escribe un mensaje...">
+                    <button id="boton">Enviar</button>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
