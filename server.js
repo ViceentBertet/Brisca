@@ -20,6 +20,9 @@ app.get("/lang-es", (req, res) => {
 app.get("/lang-en", (req, res) => {
     res.sendFile(__dirname + "/idiomas/en.json");
 });
+app.get("/lang-cat", (req, res) => {
+    res.sendFile(__dirname + "/idiomas/cat.json");
+});
 
 
 // variables para el juego

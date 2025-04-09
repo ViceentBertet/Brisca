@@ -73,24 +73,52 @@
             border-radius: 25px;
             position: relative;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-        .toggle.active {
-            background-color: #4caf50;
-        }
-        .circle {
-            width: 20px;
+        .flag {
+            width: 20px; 
             height: 20px;
-            background-color: #fff;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 5%;
-            transform: translateY(-50%);
-            transition: left 0.3s ease;
+            margin: auto;
         }
-        .toggle.active .circle {
-            left: 55%;
+
+        .custom-select-wrapper {
+            position: relative;
+            width: 220px;
+            font-family: sans-serif;
+        }
+
+        .custom-select {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .custom-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .custom-option {
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        }
+
+        .custom-option:hover {
+        background: #f0f0f0;
         }
     </style>
 </head>
@@ -98,9 +126,14 @@
     <header>
         <div class="language-switch">
             <div id="language-toggle" class="toggle">
-                <img src="img/espana.png" alt="Español" class="flag" style="width: 20px; height: 20px; position: absolute; top: 50%; left: -45%; transform: translateY(-50%);">
-                <div class="circle"></div>
-                <img src="img/reino-unido.png" alt="Inglés" class="flag" style="width: 20px; height: 20px; position: absolute; top: 50%; left: 110%; transform: translateY(-50%);">
+                <div class="custom-select" id="selectedOption">
+                  <img src="img/espana.png" alt="Español" class="flag">
+                </div>
+                <div class="custom-options" id="optionsList">
+                  <div class="custom-option" data-value="es" data-img="img/espana.png"> <img src="img/espana.png" alt="Español" class="flag"></div>
+                  <div class="custom-option" data-value="en" data-img="img/reino-unido.png"> <img src="img/reino-unido.png" alt="Inglés" class="flag"></div>
+                  <div class="custom-option" data-value="cat" data-img="img/catalunya.png"> <img src="img/catalunya.png" alt="Catalán" class="flag"></div>
+                </div>
             </div>
         </div>
         <h1>Bienvenido a la Brisca</h1>

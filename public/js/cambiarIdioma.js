@@ -1,18 +1,43 @@
 let currentLanguage = "es";
 let texts;
+
+
 window.onload = () => {
-    const toggle = document.getElementById("language-toggle");
-    toggle.addEventListener("click", () => {
-        toggle.classList.toggle("active");
-        currentLanguage = currentLanguage === "es" ? "en" : "es";
-        getIdioma(currentLanguage);
+    let options = optionsList.querySelectorAll(".custom-option");
+    selectedOption.addEventListener("click", () => {
+        let optionsList = document.getElementById("optionsList");
+        optionsList.style.display = optionsList.style.display === "block" ? "none" : "block";
+    });
+    options.forEach(option => {
+        option.addEventListener("click", () => {
+            let imgSrc = option.getAttribute("data-img");
+            currentLanguage =  option.getAttribute("data-value")
+            selectedOption.innerHTML = `<img src="${imgSrc}" class="flag" alt="${currentLanguage}">`;
+            optionsList.style.display = "none";
+            getIdioma(currentLanguage);
+        });
+    });
+    document.addEventListener("click", (e) => {
+    if (!toggle.contains(e.target)) {
+        let optionsList = document.getElementById("optionsList");
+        optionsList.style.display = "none";
+    }
     });
 }
-// TODO : solo el idioma seleccionado se debe cargar, el resto no
+
+
+
+
+
 /**
  * Envia una petición al servidor para obtener los textos del idioma seleccionado
- * @param {string} idioma - El idioma seleccionado (es o en)
+ * @param {string} idioma - El idioma seleccionado
  */
+function sacarOpcion() {
+    const toggle = document.getElementById("language-toggle");
+    
+    return selectedOption;
+}
 async function getIdioma(idioma) {
     let url = "/lang-" + idioma;
     try {

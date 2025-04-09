@@ -1,0 +1,25 @@
+{
+    "welcome": "Benvingut a la Brisca",
+    "whatIs": "Què és la Brisca?",
+    "description": "La Brisca és un joc de cartes tradicional molt popular a Espanya i Itàlia. Es juga amb una baralla espanyola i és ideal per a 2 a 4 jugadors.",
+    "basicRules": "Regles Bàsiques",
+    "rules": [
+        "S'utilitza una baralla espanyola de 40 cartes (sense vuits ni nous).",
+        "L'objectiu és sumar la major quantitat de punts possibles amb les cartes guanyades.",
+        "El valor de les cartes és el següent:",
+        "Es reparteix una mà de 3 cartes a cada jugador i es col·loca una carta descoberta a la taula que defineix el pal de triomf.",
+        "Els jugadors juguen una carta per torn, seguint el pal o usant el triomf si no tenen cartes del pal inicial.",
+        "El guanyador de la basa recull les cartes i comença la següent."
+    ],
+    "cardValues": [
+        "As: 11 punts",
+        "Tres: 10 punts",
+        "Rei: 4 punts",
+        "Cavall: 3 punts",
+        "Sota: 2 punts",
+        "La resta de cartes no tenen valor."
+    ],
+    "howToWin": "Com es guanya?",
+    "winDescription": "El jugador o equip amb més punts al final de la partida és el guanyador.",
+    "footer": "© 2023 Regles de la Brisca"
+}
