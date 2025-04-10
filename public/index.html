@@ -21,7 +21,7 @@
             padding: 1rem 0;
             text-align: center;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr 3fr 1fr;
             align-items: center;
             justify-items: center;
         }
@@ -120,6 +120,23 @@
         .custom-option:hover {
         background: #f0f0f0;
         }
+        #enlaces{
+            li {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+            }
+            a {
+                color: #f0f0f0;
+                text-decoration: none;
+            }
+            a:hover {
+                color: #ccc;
+            }
+            
+        }
     </style>
 </head>
 <body>
@@ -137,6 +154,9 @@
             </div>
         </div>
         <h1>Bienvenido a la Brisca</h1>
+        <div id="enlaces">
+            <li><a href="jugar.html">¡Juega ya!</a></li>
+        </div>
     </header>
     <div class="container" id="content">
         <h2>¿Qué es la Brisca?</h2>

@@ -60,7 +60,8 @@ function updateContent() {
     document.querySelector(".container h2:nth-of-type(1)").textContent = texts.whatIs;
     document.querySelector(".container p:nth-of-type(1)").textContent = texts.description;
     document.querySelector(".container h2:nth-of-type(2)").textContent = texts.basicRules;
-
+    document.querySelector("#enlaces a").textContent = texts.play;
+    
     let rulesList = document.querySelector(".container ul:nth-of-type(1)");
     rulesList.innerHTML = "";
     texts.rules.forEach((rule, index) => {
