@@ -217,7 +217,7 @@ section {
     align-self: flex-end;
     justify-self: center;
     text-align: center;
-    max-width: 350px;
+    width: 350px;
     height: 200px;
 }
 #cont_chat {
@@ -244,15 +244,17 @@ section {
 }
 .botonesCartas {
     position:relative;
-    top:-205px;   
+    top:-205px;
     border-radius: 50%;
+    height: 50px;
+    width: 50px;
     img {
         width: 25px;
     }
 }
 #cantarBrisca {
-    left: -50px;
+    left: -20%;
 }
 #cambiarTriunfo {
-    right: -50px;
+    right: -20%;
 }

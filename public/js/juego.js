@@ -10,6 +10,8 @@ window.onload = () => {
     boton.addEventListener("click", sendMessage);
     msg.addEventListener("keydown", function(event) {if (event.key === "Enter") sendMessage();});
     enviarNombre.addEventListener("click", guardarNombre);
+    cantarBrisca.addEventListener("click", brisca);
+    cambiarTriunfo.addEventListener("click", cantarTriunfo);
 };
 
 /*          CHAT             */
@@ -89,10 +91,12 @@ socket.on("carta", function(cartas) {
     if (Array.isArray(cartas)) {
         let div = document.getElementById("cartas");
         cartas.forEach(carta => {
+            comprobarSiete(carta);
             let img = crearCarta(carta);
             div.appendChild(img);
         });
     } else {
+        comprobarSiete(cartas);
         let div = document.getElementById("cartas");
         let img = crearCarta(cartas);
         div.appendChild(img);
@@ -116,6 +120,22 @@ socket.on("juegaCarta", function(carta) {
 socket.on("deliberando", mostrarDeliberando);
 socket.on("deliberado", borrarDeliberando);
 socket.on("terminarTurno", terminarJugada);
+socket.on("cantarTriunfo", function(carta) {
+    triunfo.querySelector('img').remove();
+    let imgTriunfo = document.createElement("img");
+    imgTriunfo.src = crearImagen(carta);
+    imgTriunfo.alt = carta;
+    triunfo.appendChild(imgTriunfo);
+});
+function comprobarSiete(carta) {
+    const COMPROBAR = "7 de " + paloTriunfo;
+    console.log("carta: " + carta + " COMPROBAR: " + COMPROBAR);
+    if (carta == COMPROBAR){
+        cambiarTriunfo.disabled = false;
+        console.log("cambiarTriunfo habilitado");
+    }
+
+}
 function cambiarTurno() {
     turno = !turno;
     if (turno) {
@@ -196,8 +216,6 @@ function determinarGanador() {
 function getResultado(cartaUno, cartaDos) {
     let indiceUno = NUMEROS_CARTAS.indexOf(sacarNumero(cartaUno));
     let indiceDos = NUMEROS_CARTAS.indexOf(sacarNumero(cartaDos));
-    console.log("cartaUno: " + cartaUno + " cartaDos: " + cartaDos);
-    console.log("indiceUno: " + indiceUno + " indiceDos: " + indiceDos);
     if (sacarPalo(cartaUno) == sacarPalo(cartaDos) && indiceUno > indiceDos) {
         return true;
     } 
@@ -242,4 +260,27 @@ function terminarJugada(ganado, newPuntos) {
 function limpiarMesa() {
     let imagenes = mesa.querySelectorAll('img');
     imagenes.forEach(imagen => imagen.remove());
+}
+function cantarTriunfo() {
+    if (turno) {
+        let imgTriunfo = triunfo.querySelector('img');
+        let cartaNueva = imgTriunfo.alt;
+        imgTriunfo.remove();
+        cont_cartas.querySelectorAll('img').forEach(function(imagen) {
+            if (imagen.alt == "7 de " + paloTriunfo) {
+                imagen.remove();
+            }
+        });
+        socket.emit("cantarTriunfo", "7 de " + paloTriunfo);
+        let nuevoTriunfo = crearCarta("7 de " + paloTriunfo);
+        triunfo.appendChild(nuevoTriunfo);
+        let imgCartaNueva = crearCarta(cartaNueva);
+        cartas.appendChild(imgCartaNueva);
+        cambiarTriunfo.disabled = true;
+    }
+}
+function brisca() {
+    if (turno) {
+
+    }
 }

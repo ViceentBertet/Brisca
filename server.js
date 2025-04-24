@@ -85,6 +85,9 @@ io.on("connection", (socket) => {
     socket.on("detGanador", (ganador, puntos) => {
         socket.broadcast.emit("terminarTurno", ganador, puntos);
     });
+    socket.on("cantarTriunfo", (carta) => {
+        socket.broadcast.emit("cantarTriunfo", carta);
+    });
     socket.on("disconnect", () => {
         if (jugadores.indexOf(socket.id) != -1) {
             let indice = jugadores.indexOf(socket.id);
