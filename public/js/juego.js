@@ -117,7 +117,7 @@ socket.on("juegaCarta", function(carta) {
 
     setTimeout(deliberando, 1000);
 });
-socket.on("deliberando", mostrarDeliberando);
+socket.on("deliberando", deliberando);
 socket.on("deliberado", borrarDeliberando);
 socket.on("terminarTurno", terminarJugada);
 socket.on("cantarTriunfo", function(carta) {
@@ -134,7 +134,14 @@ function comprobarSiete(carta) {
         cambiarTriunfo.disabled = false;
         console.log("cambiarTriunfo habilitado");
     }
-
+}
+function comprobarBrisca(carta) {
+    const COMPROBAR = "7 de " + paloTriunfo;
+    console.log("carta: " + carta + " COMPROBAR: " + COMPROBAR);
+    if (carta == COMPROBAR){
+        cambiarTriunfo.disabled = false;
+        console.log("cambiarTriunfo habilitado");
+    }
 }
 function cambiarTurno() {
     turno = !turno;
@@ -255,6 +262,10 @@ function terminarJugada(ganado, newPuntos) {
         mostrarMensaje("¡Perdiste! Tu contrincante ha sumado " + newPuntos + " puntos");
     }
     limpiarMesa();
+    if (puntos.innerText > 60) {
+        mostrarMensaje("¡Has ganado la partida!");
+        socket.emit("terminarPartida", nom);
+    }
     socket.emit("pedirCarta");
 }
 function limpiarMesa() {

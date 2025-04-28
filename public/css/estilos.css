@@ -252,6 +252,10 @@ section {
         width: 25px;
     }
 }
+.botonesCartas:enabled {
+    cursor: pointer;
+    filter: drop-shadow(0 0 5px #fcf75e);
+}
 #cantarBrisca {
     left: -20%;
 }

@@ -27,7 +27,6 @@ app.get("/lang-cat", (req, res) => {
 
 // variables para el juego
 let jugadores = [];
-let jugadoresNombre = [];
 let cartas = [
     "1 de oros", "2 de oros", "3 de oros", "4 de oros",
     "5 de oros", "6 de oros", "7 de oros", "10 de oros",
@@ -49,17 +48,17 @@ let cartas = [
 app.use(express.static('public'));
 
 io.on("connection", (socket) => {
+    let cartasPartida = cartas.slice(); 
+    let partidaTerminada = false;
     socket.on("nuevoUsuario", (nom) => {
         if (jugadores.length < 2) {
             jugadores[jugadores.length] = socket.id;
-            jugadoresNombre[jugadoresNombre.length] = nom;
             socket.emit("mensaje", "Bienvenido a la mesa " + nom);
             if (jugadores.length == 2) {
-                triunfo();
-                repartirCartas();
+                triunfo(cartasPartida);
+                repartirCartas(cartasPartida);
                 io.emit("mensaje", "La partida comienza");
-                let nuevoTurno = jugadores[Math.floor(Math.random() * jugadores.length)];
-                console.log("Turno de " + nuevoTurno);
+                let nuevoTurno = jugadores[Math.floor(Math.random() * 2)];
                 setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 2000);
             }
         } else {
@@ -67,8 +66,12 @@ io.on("connection", (socket) => {
         }
     })
     socket.on("pedirCarta", () => {
-        let carta = nuevaCarta();
-        socket.emit("carta", carta);
+        if (!partidaTerminada) {
+            let carta = nuevaCarta(cartasPartida);
+            socket.emit("carta", carta);   
+        } else {
+            socket.emit("mensaje", "La partida ha terminado, no puedes pedir más cartas");
+        }
     })
     socket.on("chat", (msg) => {
         socket.broadcast.emit("chat", msg);
@@ -87,39 +90,44 @@ io.on("connection", (socket) => {
     });
     socket.on("cantarTriunfo", (carta) => {
         socket.broadcast.emit("cantarTriunfo", carta);
+        socket.emit("mensaje", "Se ha cambiado el triunfo a " + carta);
+    });
+    socket.on("cartaBrisca", () => {
+        socket.broadcast.emit("cartaBrisca");
+    });
+    socket.on("terminarPartida", (nom) => {
+        partidaTerminada = true;
+        io.emit("mensaje", nom + " ha ganado la partida");
+        jugadores = [];
+
     });
     socket.on("disconnect", () => {
         if (jugadores.indexOf(socket.id) != -1) {
             let indice = jugadores.indexOf(socket.id);
-            let nomPerdedor = jugadoresNombre[indice];
             jugadores.splice(indice, 1);
-            jugadoresNombre.splice(indice, 1);
-            let nomGanador = jugadoresNombre[0];
-
-            io.emit("mensaje", `${nomPerdedor} ha abandonado la partida`);
-            io.emit("mensaje", `${nomGanador} ha ganado la partida`);
+            io.emit("mensaje", `Un jugador ha abandonado la partida`);
+            io.emit("mensaje", `Has ganado la partida`);
             jugadores = [];
-            jugadoresNombre = [];
         }
     })
 })
-function repartirCartas() {
+function repartirCartas(baraja) {
     jugadores.forEach(jugador => {
         let cartas = [];
         for (let i = 0; i < 3; i++) {
-            let carta = nuevaCarta();
+            let carta = nuevaCarta(baraja);
             cartas[i] =  carta;
         }
         io.to(jugador).emit("carta", cartas);
     })
 }
-function nuevaCarta() {
-    let carta = cartas[Math.floor(Math.random() * cartas.length)];
-    cartas.splice(cartas.indexOf(carta), 1);
-    console.log("Quedan " + cartas.length + " cartas en la baraja");
+function nuevaCarta(baraja) {
+    let carta = baraja[Math.floor(Math.random() * baraja.length)];
+    baraja.splice(baraja.indexOf(carta), 1);
+    console.log("Quedan " + baraja.length + " cartas en la baraja");
     return carta;
 }
-function triunfo() {
-    let triunfo = nuevaCarta();
+function triunfo(baraja) {
+    let triunfo = nuevaCarta(baraja);
     io.emit("triunfo", triunfo);
 }
