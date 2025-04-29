@@ -101,6 +101,7 @@ socket.on("carta", function(cartas) {
         let img = crearCarta(cartas);
         div.appendChild(img);
     }
+    comprobarBrisca();
 });
 socket.on("turno", cambiarTurno);
 socket.on("juegaCarta", function(carta) {
@@ -117,7 +118,7 @@ socket.on("juegaCarta", function(carta) {
 
     setTimeout(deliberando, 1000);
 });
-socket.on("deliberando", deliberando);
+socket.on("deliberando", mostrarDeliberando);
 socket.on("deliberado", borrarDeliberando);
 socket.on("terminarTurno", terminarJugada);
 socket.on("cantarTriunfo", function(carta) {
@@ -130,17 +131,21 @@ socket.on("cantarTriunfo", function(carta) {
 function comprobarSiete(carta) {
     const COMPROBAR = "7 de " + paloTriunfo;
     console.log("carta: " + carta + " COMPROBAR: " + COMPROBAR);
-    if (carta == COMPROBAR){
-        cambiarTriunfo.disabled = false;
-        console.log("cambiarTriunfo habilitado");
-    }
+    if (carta == COMPROBAR) cambiarTriunfo.disabled = false;
 }
-function comprobarBrisca(carta) {
-    const COMPROBAR = "7 de " + paloTriunfo;
-    console.log("carta: " + carta + " COMPROBAR: " + COMPROBAR);
-    if (carta == COMPROBAR){
-        cambiarTriunfo.disabled = false;
-        console.log("cambiarTriunfo habilitado");
+function comprobarBrisca() {
+    const COMPROBAR = [`1 de ${paloTriunfo}`, `3 de ${paloTriunfo}`, `12 de ${paloTriunfo}`];
+    let cartas = cartas.querySelectorAll('img');
+    let brisca = true;
+    cartas.forEach(carta => {
+        if (!COMPROBAR.includes(carta.alt)) {
+            brisca = false;
+            return;
+        }
+    });
+    if (brisca) {
+        cantarBrisca.disabled = false;
+        console.log("cantarBrisca habilitado");
     }
 }
 function cambiarTurno() {
