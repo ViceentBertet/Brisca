@@ -1,17 +1,28 @@
-const NUMEROS_CARTAS = [2, 4, 5, 6, 7, 10, 11, 12, 3, 1];
 const socket = io();
+const NUMEROS_CARTAS = [2, 4, 5, 6, 7, 10, 11, 12, 3, 1];
+
 let nom;
 let paloTriunfo;
 let turno = false;
 let ganador = false;
 let cartaUnoImg;
 let cartaDosImg;
+
+let COMPROBAR_7;
+let COMPROBAR_BRISCA;
+let COMPROBAR_2;
+
 window.onload = () => {
     boton.addEventListener("click", sendMessage);
     msg.addEventListener("keydown", function(event) {if (event.key === "Enter") sendMessage();});
     enviarNombre.addEventListener("click", guardarNombre);
     cantarBrisca.addEventListener("click", brisca);
     cambiarTriunfo.addEventListener("click", cantarTriunfo);
+    document.onkeydown = function(event) {
+        if (turno && (event.key == "s" || event.key == "b") || event.key == "d") {
+            pedirCarta(event.key);
+        }
+    }
 };
 
 /*          CHAT             */
@@ -88,18 +99,21 @@ socket.on("carta", function(cartas) {
         cont_puntos.classList.remove("ocultar");
         cont_cartas.classList.remove("ocultar");
     }
-    if (Array.isArray(cartas)) {
-        let div = document.getElementById("cartas");
+    let div = document.getElementById("cartas");
+    if (Array.isArray(cartas)) { 
+        console.log("cartas: " + cartas);       
         cartas.forEach(carta => {
-            comprobarSiete(carta);
+            comprobarCambio(carta.toString());
             let img = crearCarta(carta);
             div.appendChild(img);
         });
     } else {
-        comprobarSiete(cartas);
-        let div = document.getElementById("cartas");
+        comprobarCambio(cartas);
         let img = crearCarta(cartas);
         div.appendChild(img);
+    }
+    while (div.querySelectorAll('img').length > 3) {
+        div.querySelector('img').remove();
     }
     comprobarBrisca();
 });
@@ -110,12 +124,9 @@ socket.on("juegaCarta", function(carta) {
     contrincante.appendChild(img);
     cartaUnoImg = jugador.querySelector("img");
     cartaDosImg = contrincante.querySelector("img");
-
     if (!cartaUnoImg || !cartaDosImg) {
-        // Si no hay dos cartas, no se puede deliberar
         return;
     } 
-
     setTimeout(deliberando, 1000);
 });
 socket.on("deliberando", mostrarDeliberando);
@@ -123,22 +134,32 @@ socket.on("deliberado", borrarDeliberando);
 socket.on("terminarTurno", terminarJugada);
 socket.on("cantarTriunfo", function(carta) {
     triunfo.querySelector('img').remove();
-    let imgTriunfo = document.createElement("img");
-    imgTriunfo.src = crearImagen(carta);
-    imgTriunfo.alt = carta;
-    triunfo.appendChild(imgTriunfo);
+    let triunfoSrc = crearImagen(carta);
+    addTriunfo(carta, triunfoSrc);
+    comprobarDos();
 });
-function comprobarSiete(carta) {
-    const COMPROBAR = "7 de " + paloTriunfo;
-    console.log("carta: " + carta + " COMPROBAR: " + COMPROBAR);
-    if (carta == COMPROBAR) cambiarTriunfo.disabled = false;
+function comprobarCambio(carta) {
+    let cartaTriunfo = triunfo.querySelector("img").alt;
+    if (carta == COMPROBAR_7 || (cartaTriunfo == COMPROBAR_7 && carta == COMPROBAR_2)) 
+        cambiarTriunfo.disabled = false;
+}
+function comprobarDos() {
+    let cartaTriunfo = triunfo.querySelector("img").alt;
+    if (cartaTriunfo == COMPROBAR_7) {
+        let cartasJugador = cartas.querySelectorAll('img');
+        cartasJugador.forEach(carta => {
+            if (carta.alt == COMPROBAR_2) {
+                cambiarTriunfo.disabled = false;
+                return;
+            }
+        });
+    }
 }
 function comprobarBrisca() {
-    const COMPROBAR = [`1 de ${paloTriunfo}`, `3 de ${paloTriunfo}`, `12 de ${paloTriunfo}`];
-    let cartas = cartas.querySelectorAll('img');
+    let cartasJugador = cartas.querySelectorAll('img');
     let brisca = true;
-    cartas.forEach(carta => {
-        if (!COMPROBAR.includes(carta.alt)) {
+    cartasJugador.forEach(carta => {
+        if (!COMPROBAR_BRISCA.includes(carta.alt)) {
             brisca = false;
             return;
         }
@@ -163,6 +184,9 @@ function crearCarta(cartaString) {
 }
 function jugarCarta() {
     if (turno) {
+        if (this.alt == COMPROBAR_7 || this.alt == COMPROBAR_2) {
+            cambiarTriunfo.disabled = true;
+        }
         let carta = this.alt;
         socket.emit("jugarCarta", carta);
         let juegaCarta = document.createElement("img");
@@ -176,10 +200,8 @@ function jugarCarta() {
 function crearImagen(cartaString) {
     return "./img/" + cartaString.replace(" de ", "_") + ".png";
 }
-function pedirCarta() {
-    if (turno) {
-        socket.emit("pedirCarta");
-    }
+function pedirCarta(letra) {
+    socket.emit("pedirCarta", letra, paloTriunfo);
 }
 function addTriunfo(nomCarta, carta) {
     let newTriunfo = document.createElement("img");
@@ -187,6 +209,10 @@ function addTriunfo(nomCarta, carta) {
     newTriunfo.alt = nomCarta;
     paloTriunfo = sacarPalo(nomCarta);
     triunfo.appendChild(newTriunfo);
+    COMPROBAR_7 = "7 de " + paloTriunfo;
+    COMPROBAR_BRISCA = ["1 de " + paloTriunfo, "3 de " + paloTriunfo, "12 de " + paloTriunfo];
+    COMPROBAR_2 = "2 de " + paloTriunfo;
+
 }
 function mostrarDeliberando() {
     let div = document.createElement("div");
@@ -268,8 +294,7 @@ function terminarJugada(ganado, newPuntos) {
     }
     limpiarMesa();
     if (puntos.innerText > 60) {
-        mostrarMensaje("¡Has ganado la partida!");
-        socket.emit("terminarPartida", nom);
+        terminarPartida();
     }
     socket.emit("pedirCarta");
 }
@@ -282,21 +307,31 @@ function cantarTriunfo() {
         let imgTriunfo = triunfo.querySelector('img');
         let cartaNueva = imgTriunfo.alt;
         imgTriunfo.remove();
+        let nuevoTriunfo = "";
         cont_cartas.querySelectorAll('img').forEach(function(imagen) {
-            if (imagen.alt == "7 de " + paloTriunfo) {
+            if (imagen.alt == COMPROBAR_7 || (imagen.alt == COMPROBAR_2 && cartaNueva == COMPROBAR_7)) {
+                nuevoTriunfo = imagen.alt;
                 imagen.remove();
             }
         });
-        socket.emit("cantarTriunfo", "7 de " + paloTriunfo);
-        let nuevoTriunfo = crearCarta("7 de " + paloTriunfo);
+        socket.emit("cantarTriunfo", nuevoTriunfo);
+        nuevoTriunfo = crearCarta(nuevoTriunfo);
         triunfo.appendChild(nuevoTriunfo);
         let imgCartaNueva = crearCarta(cartaNueva);
         cartas.appendChild(imgCartaNueva);
         cambiarTriunfo.disabled = true;
+        comprobarDos();
     }
 }
 function brisca() {
     if (turno) {
-
+        puntos.innerText = parseInt(puntos.innerText) + 61;
+        cantarBrisca.disabled = true;
+        terminarPartida();
     }
+}
+function terminarPartida() {
+    mostrarMensaje("¡Has ganado la partida!");
+    socket.emit("terminarPartida", nom);
+    turno = false;
 }

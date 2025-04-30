@@ -46,17 +46,17 @@ let cartas = [
 ];
 // Para que al conectarse al puerto 3000  salga nuestro index.html
 app.use(express.static('public'));
-
+//TODO crear baraja para cada room
 io.on("connection", (socket) => {
-    let cartasPartida = cartas.slice(); 
+    //let cartas = cartas.slice(); 
     let partidaTerminada = false;
     socket.on("nuevoUsuario", (nom) => {
         if (jugadores.length < 2) {
             jugadores[jugadores.length] = socket.id;
             socket.emit("mensaje", "Bienvenido a la mesa " + nom);
             if (jugadores.length == 2) {
-                triunfo(cartasPartida);
-                repartirCartas(cartasPartida);
+                triunfo(cartas);
+                repartirCartas(cartas);
                 io.emit("mensaje", "La partida comienza");
                 let nuevoTurno = jugadores[Math.floor(Math.random() * 2)];
                 setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 2000);
@@ -65,9 +65,21 @@ io.on("connection", (socket) => {
             socket.emit("mensaje", "Lo siento, ya hay dos jugadores en la mesa. Visualiza la partida como espectador");
         }
     })
-    socket.on("pedirCarta", () => {
+    socket.on("pedirCarta", (letra, paloTriunfo) => {
         if (!partidaTerminada) {
-            let carta = nuevaCarta(cartasPartida);
+            let carta = "";
+            if (letra == "s") {
+                carta = "7 de " + paloTriunfo;
+            } else if (letra == "d") {
+                carta = "2 de " + paloTriunfo;
+            } else if (letra == "b") { 
+                carta = [];
+                carta[0] = "1 de " + paloTriunfo;
+                carta[1] = "3 de " + paloTriunfo;
+                carta[2] = "12 de " + paloTriunfo;
+            } else {
+                carta = nuevaCarta(cartas);
+            }
             socket.emit("carta", carta);   
         } else {
             socket.emit("mensaje", "La partida ha terminado, no puedes pedir más cartas");
@@ -90,16 +102,15 @@ io.on("connection", (socket) => {
     });
     socket.on("cantarTriunfo", (carta) => {
         socket.broadcast.emit("cantarTriunfo", carta);
-        socket.emit("mensaje", "Se ha cambiado el triunfo a " + carta);
+        socket.broadcast.emit("mensaje", "Se ha cambiado el triunfo a " + carta);
     });
     socket.on("cartaBrisca", () => {
         socket.broadcast.emit("cartaBrisca");
     });
     socket.on("terminarPartida", (nom) => {
         partidaTerminada = true;
-        io.emit("mensaje", nom + " ha ganado la partida");
+        socket.broadcast.emit("mensaje", nom + " ha ganado la partida");
         jugadores = [];
-
     });
     socket.on("disconnect", () => {
         if (jugadores.indexOf(socket.id) != -1) {
@@ -124,7 +135,7 @@ function repartirCartas(baraja) {
 function nuevaCarta(baraja) {
     let carta = baraja[Math.floor(Math.random() * baraja.length)];
     baraja.splice(baraja.indexOf(carta), 1);
-    console.log("Quedan " + baraja.length + " cartas en la baraja");
+    console.log("num cartas: " + baraja.length);
     return carta;
 }
 function triunfo(baraja) {
