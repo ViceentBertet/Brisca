@@ -16,15 +16,15 @@
             font-size:18px;
         }
         .container {
-            margin-top: 20%;
+            margin-top: 15%;
         }
         h1 {
             color: whitesmoke; /* Título con color claro */
         }
         .button {
             display: inline-block;
+            padding: 10px 20px;
             margin: 10px;
-            padding: 15px 30px;
             font-size: 18px;
             color: #333; /* Texto oscuro */
             background-color: whitesmoke; /* Fondo claro */
@@ -38,17 +38,46 @@
             background-color: #fcf75e; /* Fondo verde claro al pasar el mouse */
             transition: background-color 0.3s;
         }
+        .container div {
+            width: 40%;
+            margin: 0 auto;
+        }
+        #dos {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+        #crear {
+            margin: 20px auto;
+            width: 100%; 
+        }
+        input[type="text"] {
+            font-size:18px;
+            text-align:center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 40%;
+            margin: 10px;
+            margin-left: 0;
+        }
+        #unir {
+            width: 40%;
+            margin-right: 0;
+        }
+        
     </style>
 </head>
 <body>
     <div id="padre" class="container">
         <h1>Bienvenido a Brisca</h1>
-        <a href="crear.html" id="crear" class="button" style="margin-top: 20px; display: inline-block; width: 40%;">Crear Sala</a>
         <div>
-            <input type="text" id="codigoSala" placeholder="Código de la sala" style="font-size:18px;text-align:center;;padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 20%; margin-right: 10px;">
-            <button id="btnUnirse" class="button" style="padding: 10px 20px; width: 20%;">Unirse</button>
+            <button id="crear" class="button">Crear Sala</button>
         </div>
-        
+        <div id="dos">
+            <input type="text" id="codigoSala" placeholder="Código de la sala">
+            <button id="unir" class="button">Unirse</button>
+        </div>
     </div>
 </body>
 </html>

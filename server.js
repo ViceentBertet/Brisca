@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
             salas.push(sala);
             socket.emit("exito", "Sala creada con éxito, puedes invitar a tus amigos", sala);
         } else {
-            socket.emit("errorCrear", "La sala ya existe, prueba con otra");
+            socket.emit("error", "La sala ya existe, prueba con otra");
         }
     });
     socket.on("unirSala", (sala) => {
@@ -61,7 +61,7 @@ io.on("connection", (socket) => {
             socket.join(sala);
             socket.emit("exito", "Unido a la sala", sala);
         } else {
-            socket.emit("errorUnir", "La sala no existe, prueba con otra");
+            socket.emit("error", "La sala no existe, prueba con otra");
         }
     });
     let partidaTerminada = false;
