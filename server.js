@@ -24,8 +24,7 @@ app.get("/lang-cat", (req, res) => {
     res.sendFile(__dirname + "/idiomas/cat.json");
 });
 
-
-// variables para el juego
+let salas = [];
 let jugadores = [];
 let cartas = [
     "1 de oros", "2 de oros", "3 de oros", "4 de oros",
@@ -44,11 +43,27 @@ let cartas = [
     "5 de espadas", "6 de espadas", "7 de espadas", "10 de espadas",
     "11 de espadas", "12 de espadas"
 ];
-// Para que al conectarse al puerto 3000  salga nuestro index.html
 app.use(express.static('public'));
 //TODO crear baraja para cada room
 io.on("connection", (socket) => {
-    //let cartas = cartas.slice(); 
+    //let cartas = cartas.slice();
+    socket.on("crearSala", (sala) => {
+        if (salas.indexOf(sala) == -1) {
+            socket.join(sala);
+            salas.push(sala);
+            socket.emit("exito", "Sala creada con éxito, puedes invitar a tus amigos", sala);
+        } else {
+            socket.emit("errorCrear", "La sala ya existe, prueba con otra");
+        }
+    });
+    socket.on("unirSala", (sala) => {
+        if (salas.indexOf(sala) != -1) {
+            socket.join(sala);
+            socket.emit("exito", "Unido a la sala", sala);
+        } else {
+            socket.emit("errorUnir", "La sala no existe, prueba con otra");
+        }
+    });
     let partidaTerminada = false;
     socket.on("nuevoUsuario", (nom) => {
         if (jugadores.length < 2) {

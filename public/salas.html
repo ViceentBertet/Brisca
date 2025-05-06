@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salas - Brisca</title>
+    <script src="js/salas.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #222; /* Fondo oscuro como en jugar.html */
+            color: whitesmoke; /* Texto claro */
+            margin: 0;
+            padding: 0;
+            font-size:18px;
+        }
+        .container {
+            margin-top: 20%;
+        }
+        h1 {
+            color: whitesmoke; /* Título con color claro */
+        }
+        .button {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            color: #333; /* Texto oscuro */
+            background-color: whitesmoke; /* Fondo claro */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #fcf75e; /* Fondo verde claro al pasar el mouse */
+            transition: background-color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="padre" class="container">
+        <h1>Bienvenido a Brisca</h1>
+        <a href="crear.html" id="crear" class="button" style="margin-top: 20px; display: inline-block; width: 40%;">Crear Sala</a>
+        <div>
+            <input type="text" id="codigoSala" placeholder="Código de la sala" style="font-size:18px;text-align:center;;padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 20%; margin-right: 10px;">
+            <button id="btnUnirse" class="button" style="padding: 10px 20px; width: 20%;">Unirse</button>
+        </div>
+        
+    </div>
+</body>
+</html>
