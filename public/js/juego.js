@@ -11,8 +11,11 @@ let cartaDosImg;
 let COMPROBAR_7;
 let COMPROBAR_BRISCA;
 let COMPROBAR_2;
-
+let sala;
 window.onload = () => {
+    let urlParams = new URLSearchParams(window.location.search);
+    sala = urlParams.get('sala');
+    mostrarMensaje("Bienvenido a la sala " + sala + "\n ¡Comparte el código con tus amigos!");
     boton.addEventListener("click", sendMessage);
     msg.addEventListener("keydown", function(event) {if (event.key === "Enter") sendMessage();});
     enviarNombre.addEventListener("click", guardarNombre);
@@ -36,7 +39,7 @@ function guardarNombre() {
     nom = nombre.value;
     pedirNombre.classList.toggle('ocultar');
     protector.classList.toggle('ocultar');
-    socket.emit("nuevoUsuario", nom);
+    socket.emit("nuevoUsuario", nom, sala);
 }
 function sendMessage() {
     if (!msg.value) return false;

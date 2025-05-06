@@ -26,7 +26,7 @@ app.get("/lang-cat", (req, res) => {
 
 let salas = [];
 let jugadores = [];
-let cartas = [
+const CARTAS = [
     "1 de oros", "2 de oros", "3 de oros", "4 de oros",
     "5 de oros", "6 de oros", "7 de oros", "10 de oros",
     "11 de oros", "12 de oros",
@@ -46,33 +46,37 @@ let cartas = [
 app.use(express.static('public'));
 //TODO crear baraja para cada room
 io.on("connection", (socket) => {
-    //let cartas = cartas.slice();
     socket.on("crearSala", (sala) => {
         if (salas.indexOf(sala) == -1) {
             socket.join(sala);
-            salas.push(sala);
-            socket.emit("exito", "Sala creada con éxito, puedes invitar a tus amigos", sala);
+            salas.push([sala, CARTAS.slice()]);
+            console.log(socket.rooms);
+            socket.emit("exito", sala);
         } else {
-            socket.emit("error", "La sala ya existe, prueba con otra");
+            socket.emit("error", "La sala ya existe");
         }
     });
     socket.on("unirSala", (sala) => {
-        if (salas.indexOf(sala) != -1) {
+        console.log(getSalaIndex(sala));
+        if (getSalaIndex(sala) != -1) {
             socket.join(sala);
-            socket.emit("exito", "Unido a la sala", sala);
+            socket.emit("exito", sala);
+            console.log(socket.rooms);
         } else {
-            socket.emit("error", "La sala no existe, prueba con otra");
+            socket.emit("error", "La sala no existe");
         }
     });
     let partidaTerminada = false;
-    socket.on("nuevoUsuario", (nom) => {
+    socket.on("nuevoUsuario", (nom, sala) => {
+        //TODO comprobar los jugadores solo de la sala
         if (jugadores.length < 2) {
             jugadores[jugadores.length] = socket.id;
             socket.emit("mensaje", "Bienvenido a la mesa " + nom);
             if (jugadores.length == 2) {
+                let cartas = getBaraja(sala);
                 triunfo(cartas);
                 repartirCartas(cartas);
-                io.emit("mensaje", "La partida comienza");
+                io.to(Array.from(socket.rooms)[0]).emit("mensaje", "La partida comienza");
                 let nuevoTurno = jugadores[Math.floor(Math.random() * 2)];
                 setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 2000);
             }
@@ -80,7 +84,7 @@ io.on("connection", (socket) => {
             socket.emit("mensaje", "Lo siento, ya hay dos jugadores en la mesa. Visualiza la partida como espectador");
         }
     })
-    socket.on("pedirCarta", (letra, paloTriunfo) => {
+    socket.on("pedirCarta", (letra, paloTriunfo, sala) => {
         if (!partidaTerminada) {
             let carta = "";
             if (letra == "s") {
@@ -93,46 +97,47 @@ io.on("connection", (socket) => {
                 carta[1] = "3 de " + paloTriunfo;
                 carta[2] = "12 de " + paloTriunfo;
             } else {
-                carta = nuevaCarta(cartas);
+                let baraja = getBaraja(sala);
+                carta = nuevaCarta(baraja);
             }
-            socket.emit("carta", carta);   
+            socket.to(socket.rooms[0]).emit("carta", carta);   
         } else {
             socket.emit("mensaje", "La partida ha terminado, no puedes pedir más cartas");
         }
     })
     socket.on("chat", (msg) => {
-        socket.broadcast.emit("chat", msg);
+        socket.to(Array.from(socket.rooms)[0]).emit("chat", msg);
     });
     socket.on("jugarCarta", (carta) => {
-        socket.broadcast.emit("juegaCarta", carta);
+        socket.to(Array.from(socket.rooms)[0]).emit("juegaCarta", carta);
     });
     socket.on("mostrarDeliberando",() => {
-        socket.broadcast.emit("deliberando");
+        socket.to(Array.from(socket.rooms)[0]).emit("deliberando");
     });
     socket.on("borrarDeliberando",() => {
-        socket.broadcast.emit("deliberado");
+        socket.to(Array.from(socket.rooms)[0]).emit("deliberado");
     });
     socket.on("detGanador", (ganador, puntos) => {
-        socket.broadcast.emit("terminarTurno", ganador, puntos);
+        socket.to(Array.from(socket.rooms)[0]).emit("terminarTurno", ganador, puntos);
     });
     socket.on("cantarTriunfo", (carta) => {
-        socket.broadcast.emit("cantarTriunfo", carta);
-        socket.broadcast.emit("mensaje", "Se ha cambiado el triunfo a " + carta);
+        socket.to(Array.from(socket.rooms)[0]).emit("cantarTriunfo", carta);
+        socket.to(Array.from(socket.rooms)[0]).emit("mensaje", "Se ha cambiado el triunfo a " + carta);
     });
     socket.on("cartaBrisca", () => {
-        socket.broadcast.emit("cartaBrisca");
+        socket.to(Array.from(socket.rooms)[0]).emit("cartaBrisca");
     });
     socket.on("terminarPartida", (nom) => {
         partidaTerminada = true;
-        socket.broadcast.emit("mensaje", nom + " ha ganado la partida");
+        socket.to(Array.from(socket.rooms)[0]).emit("mensaje", nom + " ha ganado la partida");
         jugadores = [];
     });
     socket.on("disconnect", () => {
         if (jugadores.indexOf(socket.id) != -1) {
             let indice = jugadores.indexOf(socket.id);
             jugadores.splice(indice, 1);
-            io.emit("mensaje", `Un jugador ha abandonado la partida`);
-            io.emit("mensaje", `Has ganado la partida`);
+            io.to(Array.from(socket.rooms)[0]).emit("mensaje", `Un jugador ha abandonado la partida`);
+            io.to(Array.from(socket.rooms)[0]).emit("mensaje", `Has ganado la partida`);
             jugadores = [];
         }
     })
@@ -156,4 +161,13 @@ function nuevaCarta(baraja) {
 function triunfo(baraja) {
     let triunfo = nuevaCarta(baraja);
     io.emit("triunfo", triunfo);
+}
+function getBaraja(sala) {
+    return salas[getSalaIndex(sala)][1];
+}
+function getSalaIndex(sala) {
+    return salas.findIndex(fila => fila.includes(sala))
+}
+function comprobarSalas() {
+    
 }

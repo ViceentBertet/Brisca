@@ -1,21 +1,18 @@
 const socket = io();
 
-window.onload = function() {
+window.onload = () => {
     unir.addEventListener('click', unirSala);
     crear.addEventListener('click', crearSala);
 }
 function unirSala() {
-    let div = padre.querySelector('div');
-
-    let input = div.querySelector('input');
-    input.placeholder = 'ID de la sala';
-    let boton = document.createElement('button');
-    boton.innerText = 'Unirse';
-    boton.addEventListener('click', function() {
-        let sala = input.value;
+    let input = padre.querySelector('input');
+    let sala = input.value;
+    if (sala.length == 6) {
         socket.emit('unirSala', sala);
-    });
-    div.appendChild(input);
+    } else {
+        input.placeholder = 'El código de la sala debe tener 6 caracteres';
+        input.value = '';
+    }
 }
 function crearSala() {
     let codigo = generarCodigoSala();
@@ -24,7 +21,7 @@ function crearSala() {
 function generarCodigoSala() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
-socket.on('exito', function(msj, sala) {
+socket.on('exito', function(sala) {
     window.location.href = '/jugar.html?sala=' + sala;
 });
 socket.on('error', function(msj) {
