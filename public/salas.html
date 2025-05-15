@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salas - Brisca</title>
+    <title>Crea tu propia sala</title>
     <script src="/socket.io/socket.io.js"></script>
+    <link rel="icon" type="image/png" href="img/icono.png">
     <script src="js/salas.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #222; /* Fondo oscuro como en jugar.html */
-            color: whitesmoke; /* Texto claro */
+            background-color: #222; 
+            color: whitesmoke;
             margin: 0;
             padding: 0;
             font-size:18px;
@@ -20,15 +21,15 @@
             margin-top: 15%;
         }
         h1 {
-            color: whitesmoke; /* Título con color claro */
+            color: whitesmoke;
         }
         .button {
             display: inline-block;
             padding: 10px 20px;
             margin: 10px;
             font-size: 18px;
-            color: #333; /* Texto oscuro */
-            background-color: whitesmoke; /* Fondo claro */
+            color: #333; 
+            background-color: whitesmoke; 
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -36,7 +37,7 @@
             transition: background-color 0.3s;
         }
         .button:hover {
-            background-color: #fcf75e; /* Fondo verde claro al pasar el mouse */
+            background-color: #fcf75e; 
             transition: background-color 0.3s;
         }
         .container div {
@@ -76,7 +77,7 @@
             <button id="crear" class="button">Crear Sala</button>
         </div>
         <div id="dos">
-            <input type="text" id="codigoSala" placeholder="Código de la sala">
+            <input type="text" id="codigoSala" autocomplete="off" placeholder="Código de la sala">
             <button id="unir" class="button">Unirse</button>
         </div>
     </div>

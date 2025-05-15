@@ -335,6 +335,6 @@ function brisca() {
 }
 function terminarPartida() {
     mostrarMensaje("¡Has ganado la partida!");
-    socket.emit("terminarPartida", nom);
+    socket.emit("terminarPartida", nom, sala);
     turno = false;
 }
