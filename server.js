@@ -1,16 +1,16 @@
 // constantes del servidor
 const express = require("express");
 const http = require("http");
-const socketIo = require("socket.io");
+const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server);
 
 const PORT = 3000;
 server.listen(PORT, () => {
     console.log("Servidor corriendo en el puerto " + PORT);
-})
+});
 
 // Enviar los archivos de idioma al cliente
 app.get("/lang-es", (req, res) => {
@@ -44,36 +44,39 @@ const CARTAS = [
 app.use(express.static('public'));
 //TODO crear baraja para cada room
 io.on("connection", (socket) => {
-    socket.on("crearSala", (sala) => {
-        console.log("Creando sala " + sala);
-        if (salas.indexOf(sala) == -1) {
-            socket.join(sala);
-            salas.push([sala, CARTAS.slice(), new Set()]);
-            socket.emit("exito", sala);
+    socket.on("crearSala", (nuevaSala) => {
+        if (getSalaIndex(nuevaSala) == -1) {
+            salas.push([nuevaSala, CARTAS.slice(), new Set()]);
+            socket.emit("exito", nuevaSala);
         } else {
             socket.emit("error", "La sala ya existe");
         }
     });
     socket.on("unirSala", (sala) => {
         if (getSalaIndex(sala) != -1) {
-            socket.join(sala);
             socket.emit("exito", sala);
         } else {
             socket.emit("error", "La sala no existe");
         }
     });
     let partidaTerminada = false;
-    socket.on("nuevoUsuario", (nom, sala) => {
+    socket.on("nuevoUsuario", (nom, newSala) => {
+        socket.nombre = nom;
+        socket.miSala = newSala;
+
+        console.log("El usuario " + socket.nombre + " se ha unido a la sala " + socket.miSala);
         
-        salas[getSalaIndex(sala)][2].add(socket.id);
-        if (salas[getSalaIndex(sala)][2].size < 3) {
-            socket.emit("mensaje", "Bienvenido a la mesa " + nom);
-            if (salas[getSalaIndex(sala)][2].size == 2) {
-                let cartas = getBaraja(sala);
-                triunfo(cartas, sala);
-                repartirCartas(cartas, sala);
-                enviarMensaje(sala,"La partida comienza");
-                let turnoDisponible = Array.from(salas[getSalaIndex(sala)][2]);
+        socket.join(socket.miSala);
+        salas[getSalaIndex(socket.miSala)][2].add(socket.id);
+
+        if (salas[getSalaIndex(socket.miSala)][2].size < 3) {
+            socket.emit("mensaje", "Bienvenido a la mesa " + socket.nombre);
+            if (salas[getSalaIndex(socket.miSala)][2].size == 2) {
+                let cartas = getBaraja(socket.miSala);
+                triunfo(cartas, socket.miSala);
+                repartirCartas(cartas, socket.miSala);
+                enviarMensaje(socket.miSala,"La partida comienza");
+                let turnoDisponible = Array.from(salas[getSalaIndex(socket.miSala)][2]);
                 let nuevoTurno = turnoDisponible[Math.floor(Math.random() * 2)];
                 setTimeout(() =>  io.to(nuevoTurno).emit("turno"), 2000);
             }
@@ -81,7 +84,7 @@ io.on("connection", (socket) => {
             socket.emit("mensaje", "Lo siento, ya hay dos jugadores en la mesa. Visualiza la partida como espectador");
         }
     })
-    socket.on("pedirCarta", (letra, paloTriunfo, sala) => {
+    socket.on("pedirCarta", (letra, paloTriunfo) => {
         if (!partidaTerminada) {
             let carta = "";
             if (letra == "s") {
@@ -94,54 +97,55 @@ io.on("connection", (socket) => {
                 carta[1] = "3 de " + paloTriunfo;
                 carta[2] = "12 de " + paloTriunfo;
             } else {
-                let baraja = getBaraja(sala);
+                let baraja = getBaraja(socket.miSala);
                 carta = nuevaCarta(baraja);
             }
-            socket.to(socket.rooms[0]).emit("carta", carta);   
+            // Enviar la carta a la sala correspondiente
+            socket.to(socket.miSala).emit("carta", carta);   
         } else {
             socket.emit("mensaje", "La partida ha terminado, no puedes pedir más cartas");
         }
     })
     socket.on("chat", (msg) => {
-        socket.to(Array.from(socket.rooms)[0]).emit("chat", msg);
+        socket.to(socket.miSala).emit("chat", msg);
     });
     socket.on("jugarCarta", (carta) => {
-        socket.to(Array.from(socket.rooms)[0]).emit("juegaCarta", carta);
+        socket.to(socket.miSala).emit("juegaCarta", carta);
     });
     socket.on("mostrarDeliberando",() => {
-        socket.to(Array.from(socket.rooms)[0]).emit("deliberando");
+        socket.to(socket.miSala).emit("deliberando");
     });
     socket.on("borrarDeliberando",() => {
-        socket.to(Array.from(socket.rooms)[0]).emit("deliberado");
+       socket.to(socket.miSala).emit("deliberado");
     });
     socket.on("detGanador", (ganador, puntos) => {
-        socket.to(Array.from(socket.rooms)[0]).emit("terminarTurno", ganador, puntos);
+        socket.to(socket.miSala).emit("terminarTurno", ganador, puntos);
     });
     socket.on("cantarTriunfo", (carta) => {
-        socket.to(Array.from(socket.rooms)[0]).emit("cantarTriunfo", carta);
-        socket.to(Array.from(socket.rooms)[0]).emit("mensaje", "Se ha cambiado el triunfo a " + carta);
+        socket.to(socket.miSala).emit("cantarTriunfo", carta);
+        socket.to(socket.miSala).emit("mensaje", "Se ha cambiado el triunfo a " + carta);
     });
     socket.on("cartaBrisca", () => {
-        socket.to(Array.from(socket.rooms)[0]).emit("cartaBrisca");
+       socket.to(socket.miSala).emit("cartaBrisca");
     });
-    socket.on("terminarPartida", (nom, sala) => {
-        partidaTerminada = true;
-        socket.to(Array.from(socket.rooms)[0]).emit("mensaje", nom + " ha ganado la partida");
-        salas.splice(getSalaIndex(sala), 1);
-
+    socket.on("terminarPartida", () => {
+        socket.to(socket.miSala).emit("mensaje", socket.nombre + " ha ganado la partida");
+        salas.splice(getSalaIndex(socket.miSala), 1);
+        socket.miSala = null;
     });
     socket.on("disconnect", () => {
-        let found = getPosJugador(socket.id);
+        let found = getPosJugador(socket.id, socket.miSala);
         if (found.boolean ) {
             let jugadoresSala = Array.from(salas[found.pos[0]][2]);
-            console.log("El usuario " + socket.id + " se ha desconectado");
+            console.log("El usuario " + socket.nom + " se ha desconectado");
             jugadoresSala.splice(found.pos[1], 1);
             if (jugadoresSala.length < 2) {
-                enviarMensaje(salas[found.pos[0]][0], `Un jugador ha abandonado la partida`);
+                enviarMensaje(salas[found.pos[0]][0], `El jugador ${socket.nom} ha abandonado la partida`);
                 io.to(salas[found.pos[0]][0]).emit("mensaje", `Has ganado la partida`);
                 enviarMensaje(salas[found.pos[0]][0], `La partida ha terminado`);
                 console.log("Se ha borrado la sala " + salas[found.pos[0]][0]);
                 salas.splice(found.pos[0], 1);
+                socket.miSala = null;
             }
         }
     })
@@ -175,22 +179,18 @@ function getBaraja(sala) {
     return salas[getSalaIndex(sala)][1];
 }
 function getSalaIndex(sala) {
-    return salas.findIndex(fila => fila.includes(sala))
+    return salas.findIndex(fila => fila[0].includes(sala));
 }
-function getPosJugador(id) {
-    console.log("id: " + id);
+function getPosJugador(id, sala) {
     let found = {boolean: false, pos: []};
-    for (let i = 0; i < salas.length; i++) {
-        for (let j = 0; j < salas[i][2].size; j++) {
-            if (Array.from(salas[i][2])[j] == id) {
+    
+    for (let i = 0; i < salas[getSalaIndex(sala)][2].size; i++) {
+          if (Array.from(salas[getSalaIndex(sala)][2])[i] == id) {
                 found.boolean = true;
+                found.pos.push(getSalaIndex(sala));
                 found.pos.push(i);
-                found.pos.push(j);
-                console.log("jugador encontrado " + i + " 2 " + j);
                 break;
-            }
-        }
-        if (found.boolean) break;
-    }
-    return found;
+          }
+     }
+     return found;
 }

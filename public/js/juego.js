@@ -44,7 +44,7 @@ function guardarNombre() {
 function sendMessage() {
     if (!msg.value) return false;
     const message = [msg.value, nom];
-    socket.emit("chat", message);
+    socket.emit("chat", message, sala);
     addMessage(message, true);
     msg.value = "";
 }
@@ -191,7 +191,7 @@ function jugarCarta() {
             cambiarTriunfo.disabled = true;
         }
         let carta = this.alt;
-        socket.emit("jugarCarta", carta);
+        socket.emit("jugarCarta", carta, sala);
         let juegaCarta = document.createElement("img");
         juegaCarta.alt = carta;
         juegaCarta.src = crearImagen(carta);
@@ -232,12 +232,12 @@ function borrarDeliberando() {
     protector.classList.add('ocultar');
 }
 function deliberando() {
-    socket.emit("mostrarDeliberando");
+    socket.emit("mostrarDeliberando", sala);
     mostrarDeliberando();
     setTimeout(deliberado, 1000);
 }
 function deliberado() {
-    socket.emit("borrarDeliberando");
+    socket.emit("borrarDeliberando", sala);
     borrarDeliberando();
     setTimeout(determinarGanador, 1000);
 }
@@ -248,7 +248,7 @@ function determinarGanador() {
     ganador = getResultado(cartaUno, cartaDos);
     let puntosTotales = sacarPuntos(cartaUno) + sacarPuntos(cartaDos);
     terminarJugada(ganador, puntosTotales);
-    socket.emit("detGanador", !ganador, puntosTotales);
+    socket.emit("detGanador", !ganador, puntosTotales, sala);
     ganador = false;
 }
 /**
@@ -317,7 +317,7 @@ function cantarTriunfo() {
                 imagen.remove();
             }
         });
-        socket.emit("cantarTriunfo", nuevoTriunfo);
+        socket.emit("cantarTriunfo", nuevoTriunfo, sala);
         nuevoTriunfo = crearCarta(nuevoTriunfo);
         triunfo.appendChild(nuevoTriunfo);
         let imgCartaNueva = crearCarta(cartaNueva);
@@ -335,6 +335,6 @@ function brisca() {
 }
 function terminarPartida() {
     mostrarMensaje("¡Has ganado la partida!");
-    socket.emit("terminarPartida", nom, sala);
+    socket.emit("terminarPartida", sala);
     turno = false;
 }
