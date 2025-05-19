@@ -127,7 +127,8 @@ io.on("connection", (socket) => {
     socket.on("terminarPartida", (nom, sala) => {
         partidaTerminada = true;
         socket.to(Array.from(socket.rooms)[0]).emit("mensaje", nom + " ha ganado la partida");
-        //salas[getSalaIndex(sala)].remove();
+        salas.splice(getSalaIndex(sala), 1);
+
     });
     socket.on("disconnect", () => {
         let found = getPosJugador(socket.id);
@@ -139,8 +140,6 @@ io.on("connection", (socket) => {
                 enviarMensaje(salas[found.pos[0]][0], `Un jugador ha abandonado la partida`);
                 io.to(salas[found.pos[0]][0]).emit("mensaje", `Has ganado la partida`);
                 enviarMensaje(salas[found.pos[0]][0], `La partida ha terminado`);
-
-
                 console.log("Se ha borrado la sala " + salas[found.pos[0]][0]);
                 salas.splice(found.pos[0], 1);
             }
