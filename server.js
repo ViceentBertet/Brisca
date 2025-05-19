@@ -134,7 +134,7 @@ io.on("connection", (socket) => {
         socket.miSala = null;
     });
     socket.on("disconnect", () => {
-        let found = getPosJugador(socket.id, socket.miSala);
+        let found = getPosJugador(socket.id);
         if (found.boolean ) {
             let jugadoresSala = Array.from(salas[found.pos[0]][2]);
             console.log("El usuario " + socket.nom + " se ha desconectado");
@@ -168,7 +168,6 @@ function repartirCartas(baraja, sala) {
 function nuevaCarta(baraja) {
     let carta = baraja[Math.floor(Math.random() * baraja.length)];
     baraja.splice(baraja.indexOf(carta), 1);
-    console.log("num cartas: " + baraja.length);
     return carta;
 }
 function triunfo(baraja, sala) {
@@ -181,16 +180,19 @@ function getBaraja(sala) {
 function getSalaIndex(sala) {
     return salas.findIndex(fila => fila[0].includes(sala));
 }
-function getPosJugador(id, sala) {
+function getPosJugador(id) {
     let found = {boolean: false, pos: []};
-    
-    for (let i = 0; i < salas[getSalaIndex(sala)][2].size; i++) {
-          if (Array.from(salas[getSalaIndex(sala)][2])[i] == id) {
+    for (let i = 0; i < salas.length; i++) {
+        for (let j = 0; j < salas[i][2].size; j++) {
+            if (Array.from(salas[i][2])[j] == id) {
                 found.boolean = true;
-                found.pos.push(getSalaIndex(sala));
                 found.pos.push(i);
+                found.pos.push(j);
+                console.log("jugador encontrado " + i + " 2 " + j);
                 break;
-          }
-     }
-     return found;
+            }
+        }
+        if (found.boolean) break;
+    }
+    return found;
 }
