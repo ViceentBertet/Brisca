@@ -84,23 +84,11 @@ io.on("connection", (socket) => {
             socket.emit("mensaje", "Lo siento, ya hay dos jugadores en la mesa. Visualiza la partida como espectador");
         }
     })
-    socket.on("pedirCarta", (letra, paloTriunfo) => {
+    socket.on("pedirCarta", () => {
         if (!partidaTerminada) {
-            let carta = "";
-            if (letra == "s") {
-                carta = "7 de " + paloTriunfo;
-            } else if (letra == "d") {
-                carta = "2 de " + paloTriunfo;
-            } else if (letra == "b") { 
-                carta = [];
-                carta[0] = "1 de " + paloTriunfo;
-                carta[1] = "3 de " + paloTriunfo;
-                carta[2] = "12 de " + paloTriunfo;
-            } else {
-                let baraja = getBaraja(socket.miSala);
-                carta = nuevaCarta(baraja);
-            }
-            // Enviar la carta a la sala correspondiente
+            let baraja = getBaraja(socket.miSala);
+            let carta = nuevaCarta(baraja);
+            
             socket.to(socket.miSala).emit("carta", carta);   
         } else {
             socket.emit("mensaje", "La partida ha terminado, no puedes pedir más cartas");

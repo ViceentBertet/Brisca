@@ -21,11 +21,6 @@ window.onload = () => {
     enviarNombre.addEventListener("click", guardarNombre);
     cantarBrisca.addEventListener("click", brisca);
     cambiarTriunfo.addEventListener("click", cantarTriunfo);
-    document.onkeydown = function(event) {
-        if (turno && (event.key == "s" || event.key == "b") || event.key == "d") {
-            pedirCarta(event.key);
-        }
-    }
 };
 
 /*          CHAT             */
@@ -202,9 +197,6 @@ function jugarCarta() {
 }
 function crearImagen(cartaString) {
     return "./img/" + cartaString.replace(" de ", "_") + ".png";
-}
-function pedirCarta(letra) {
-    socket.emit("pedirCarta", letra, paloTriunfo);
 }
 function addTriunfo(nomCarta, carta) {
     let newTriunfo = document.createElement("img");
