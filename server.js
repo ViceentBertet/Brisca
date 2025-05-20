@@ -89,11 +89,12 @@ io.on("connection", (socket) => {
             let baraja = getBaraja(socket.miSala);
             let carta = nuevaCarta(baraja);
             
-            socket.to(socket.miSala).emit("carta", carta);   
+            socket.to(socket.miSala).emit("carta", carta);
+            io.to(socket.miSala).emit("numBaraja", baraja.length);
         } else {
             socket.emit("mensaje", "La partida ha terminado, no puedes pedir más cartas");
         }
-    })
+    }) 
     socket.on("chat", (msg) => {
         socket.to(socket.miSala).emit("chat", msg);
     });
@@ -123,7 +124,7 @@ io.on("connection", (socket) => {
     });
     socket.on("disconnect", () => {
         let found = getPosJugador(socket.id);
-        if (found.boolean ) {
+        if (found.boolean) {
             let jugadoresSala = Array.from(salas[found.pos[0]][2]);
             console.log("El usuario " + socket.nom + " se ha desconectado");
             jugadoresSala.splice(found.pos[1], 1);
@@ -131,6 +132,8 @@ io.on("connection", (socket) => {
                 enviarMensaje(salas[found.pos[0]][0], `El jugador ${socket.nom} ha abandonado la partida`);
                 io.to(salas[found.pos[0]][0]).emit("mensaje", `Has ganado la partida`);
                 enviarMensaje(salas[found.pos[0]][0], `La partida ha terminado`);
+            }
+            if (jugadoresSala.length == 0) {
                 console.log("Se ha borrado la sala " + salas[found.pos[0]][0]);
                 salas.splice(found.pos[0], 1);
                 socket.miSala = null;
@@ -151,6 +154,7 @@ function repartirCartas(baraja, sala) {
             cartas[i] =  carta;
         }
         io.to(jugador).emit("carta", cartas);
+        io.to(sala).emit("numBaraja", baraja.length);
     })
 }
 function nuevaCarta(baraja) {

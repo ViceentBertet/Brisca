@@ -10,7 +10,7 @@
     <script src="js/juego.js"></script>
 </head>
 <body>
-    <div id="pedirNombre" class="contenedor centrar">
+    <div id="pedirNombre" class="contenedor centrar brillar">
         <h2>Introduce tu nombre:</h2>
         <input type="text" name="nombre" id="nombre" autocomplete="off" placeholder="Escribelo aquí...">
         <button id="enviarNombre" >Aceptar</button>
@@ -27,14 +27,24 @@
             </div>
             <div id="cont_triunfo" class="contenedor ocultar">
                 <h2>Triunfo</h2>
-                <div id="triunfo"></div>
+                <div id="triunfo"></div>    
             </div>            
         </section>
         <section id="abajo">
             <div id="cont_info">
                 <div id="cont_puntos" class="contenedor ocultar">
-                    <h2>Tus puntos:</h2>
-                    <div id="puntos">0</div>
+                    <div>
+                        <h3>Puntos:</h3>
+                        <div id="puntos" class="num puntos">0</div>
+                    </div>
+                    <div>
+                        <h3>Rival:</h3>
+                        <div id="puntosCont" class="num puntosCont">0</div>
+                    </div>
+                    <div>
+                        <h3>Baraja:</h3>
+                        <div id="cartasRest" class="num">40</div>
+                    </div>
                 </div>
                 <div id="cont_cartas" class="contenedor ocultar">
                     <h2>Cartas</h2>

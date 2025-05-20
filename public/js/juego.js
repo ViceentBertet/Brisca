@@ -5,6 +5,7 @@ let nom;
 let paloTriunfo;
 let turno = false;
 let ganador = false;
+let partidaTerminada = false;
 let cartaUnoImg;
 let cartaDosImg;
 
@@ -13,6 +14,7 @@ let COMPROBAR_BRISCA;
 let COMPROBAR_2;
 let sala;
 window.onload = () => {
+    partidaTerminada = false;
     let urlParams = new URLSearchParams(window.location.search);
     sala = urlParams.get('sala');
     mostrarMensaje("Bienvenido a la sala " + sala + "\n ¡Comparte el código con tus amigos!");
@@ -99,7 +101,6 @@ socket.on("carta", function(cartas) {
     }
     let div = document.getElementById("cartas");
     if (Array.isArray(cartas)) { 
-        console.log("cartas: " + cartas);       
         cartas.forEach(carta => {
             comprobarCambio(carta.toString());
             let img = crearCarta(carta);
@@ -136,6 +137,9 @@ socket.on("cantarTriunfo", function(carta) {
     addTriunfo(carta, triunfoSrc);
     comprobarDos();
 });
+socket.on("numBaraja", function(numBaraja) {
+    cartasRest.innerText = numBaraja;
+});
 function comprobarCambio(carta) {
     let cartaTriunfo = triunfo.querySelector("img").alt;
     if (carta == COMPROBAR_7 || (cartaTriunfo == COMPROBAR_7 && carta == COMPROBAR_2)) 
@@ -164,12 +168,11 @@ function comprobarBrisca() {
     });
     if (brisca) {
         cantarBrisca.disabled = false;
-        console.log("cantarBrisca habilitado");
     }
 }
 function cambiarTurno() {
     turno = !turno;
-    if (turno) {
+    if (turno && !partidaTerminada) {
         mostrarMensaje("¡Corre! Es tu turno");
     }
 }
@@ -285,8 +288,10 @@ function terminarJugada(ganado, newPuntos) {
         mostrarMensaje("¡Ganaste! Has sumado " + newPuntos + " puntos");
         setTimeout(cambiarTurno, 1000);
     } else {
+        puntosCont.innerText = parseInt(puntosCont.innerText) + newPuntos;
         mostrarMensaje("¡Perdiste! Tu contrincante ha sumado " + newPuntos + " puntos");
     }
+    popUpPuntos(newPuntos, ganado);
     limpiarMesa();
     if (puntos.innerText > 60) {
         terminarPartida();
@@ -316,6 +321,7 @@ function cantarTriunfo() {
         cartas.appendChild(imgCartaNueva);
         cambiarTriunfo.disabled = true;
         comprobarDos();
+        comprobarBrisca();
     }
 }
 function brisca() {
@@ -329,4 +335,28 @@ function terminarPartida() {
     mostrarMensaje("¡Has ganado la partida!");
     socket.emit("terminarPartida", sala);
     turno = false;
+    partidaTerminada = true;
+}
+function popUpPuntos(puntos, ganador) {
+    let msj = "";
+    let div = document.createElement("div");
+    if (ganador) {
+        msj = "¡Ganaste " + puntos + " puntos!";
+        div.classList.add("puntos");
+        
+    } else {
+        msj = "¡Tu contrincante ha ganado " + puntos + " puntos!";
+        div.classList.add("puntosCont");
+    }
+    div.innerText = msj;
+    div.classList.add("contenedor");
+    div.classList.add("centrar");
+    div.classList.add("brillar");
+
+    document.querySelector('body').appendChild(div);
+    protector.classList.remove('ocultar');
+    setTimeout(() => {
+        div.remove();
+        protector.classList.add('ocultar');
+    }, 3000);
 }
