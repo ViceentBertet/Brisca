@@ -6,6 +6,7 @@ let paloTriunfo;
 let turno = false;
 let ganador = false;
 let partidaTerminada = false;
+let triunfoEntregado = false;
 let cartaUnoImg;
 let cartaDosImg;
 
@@ -34,9 +35,11 @@ socket.on("mensaje", function(msg) {
 });
 function guardarNombre() {
     nom = nombre.value;
-    pedirNombre.classList.toggle('ocultar');
-    protector.classList.toggle('ocultar');
-    socket.emit("nuevoUsuario", nom, sala);
+    if (nom != "") {
+        pedirNombre.classList.toggle('ocultar');
+        protector.classList.toggle('ocultar');
+        socket.emit("nuevoUsuario", nom, sala);
+    }
 }
 function sendMessage() {
     if (!msg.value) return false;
@@ -93,6 +96,13 @@ socket.on("triunfo", function(triunfo) {
     let triunfoSrc = crearImagen(triunfo);
     addTriunfo(triunfo, triunfoSrc);
 });
+socket.on("ultimaCarta", function() {
+    triunfoEntregado = true;
+    triunfo.querySelector('img').remove();
+});
+socket.on("numBaraja", function(numCartas) {
+    cartasRest.innerText = numCartas;
+});
 socket.on("carta", function(cartas) {
     if (cont_cartas.classList.contains("ocultar") && cont_triunfo.classList.contains("ocultar") && cont_puntos.classList.contains("ocultar")) {
         cont_triunfo.classList.remove("ocultar");
@@ -136,9 +146,6 @@ socket.on("cantarTriunfo", function(carta) {
     let triunfoSrc = crearImagen(carta);
     addTriunfo(carta, triunfoSrc);
     comprobarDos();
-});
-socket.on("numBaraja", function(numBaraja) {
-    cartasRest.innerText = numBaraja;
 });
 function comprobarCambio(carta) {
     let cartaTriunfo = triunfo.querySelector("img").alt;
@@ -290,13 +297,21 @@ function terminarJugada(ganado, newPuntos) {
     } else {
         puntosCont.innerText = parseInt(puntosCont.innerText) + newPuntos;
         mostrarMensaje("¡Perdiste! Tu contrincante ha sumado " + newPuntos + " puntos");
+        if (cartasRest.innerText == 1 && !triunfoEntregado) {
+            let img = triunfo.querySelector('img').alt;
+            triunfo.querySelector('img').remove();
+            let imgTriunfo = crearCarta(img);
+            cartas.appendChild(imgTriunfo);
+            socket.emit("ultimaCarta", nom);
+        }
     }
     popUpPuntos(newPuntos, ganado);
     limpiarMesa();
     if (puntos.innerText > 60) {
         terminarPartida();
+    } else if (ganado) {
+        socket.emit("pedirCarta");
     }
-    socket.emit("pedirCarta");
 }
 function limpiarMesa() {
     let imagenes = mesa.querySelectorAll('img');

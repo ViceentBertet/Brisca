@@ -86,11 +86,14 @@ io.on("connection", (socket) => {
     })
     socket.on("pedirCarta", () => {
         if (!partidaTerminada) {
-            let baraja = getBaraja(socket.miSala);
-            let carta = nuevaCarta(baraja);
+            let sala = socket.miSala;
+            let baraja = getBaraja(sala);
+             Array.from(salas[getSalaIndex(sala)][2]).forEach(jugador => {
+                let carta = nuevaCarta(baraja);
+                io.to(jugador).emit("carta", carta);
+            })
             
-            socket.to(socket.miSala).emit("carta", carta);
-            io.to(socket.miSala).emit("numBaraja", baraja.length);
+            io.to(sala).emit("numBaraja", baraja.length);
         } else {
             socket.emit("mensaje", "La partida ha terminado, no puedes pedir más cartas");
         }
@@ -117,6 +120,10 @@ io.on("connection", (socket) => {
     socket.on("cartaBrisca", () => {
        socket.to(socket.miSala).emit("cartaBrisca");
     });
+    socket.on("ultimaCarta", (nom) => {
+        socket.to(socket.miSala).emit("mensaje", "¡" + nom + " se ha llevado el triunfo!");
+        socket.to(socket.miSala).emit("ultimaCarta");
+    });
     socket.on("terminarPartida", () => {
         socket.to(socket.miSala).emit("mensaje", socket.nombre + " ha ganado la partida");
         salas.splice(getSalaIndex(socket.miSala), 1);
@@ -129,7 +136,7 @@ io.on("connection", (socket) => {
             console.log("El usuario " + socket.nom + " se ha desconectado");
             jugadoresSala.splice(found.pos[1], 1);
             if (jugadoresSala.length < 2) {
-                enviarMensaje(salas[found.pos[0]][0], `El jugador ${socket.nom} ha abandonado la partida`);
+                enviarMensaje(salas[found.pos[0]][0], `Un jugador ha abandonado la partida`);
                 io.to(salas[found.pos[0]][0]).emit("mensaje", `Has ganado la partida`);
                 enviarMensaje(salas[found.pos[0]][0], `La partida ha terminado`);
             }
@@ -153,8 +160,8 @@ function repartirCartas(baraja, sala) {
             let carta = nuevaCarta(baraja);
             cartas[i] =  carta;
         }
-        io.to(jugador).emit("carta", cartas);
         io.to(sala).emit("numBaraja", baraja.length);
+        io.to(jugador).emit("carta", cartas);
     })
 }
 function nuevaCarta(baraja) {
